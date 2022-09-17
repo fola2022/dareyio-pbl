@@ -59,6 +59,50 @@
 <img width="545" alt="post on postman" src="https://user-images.githubusercontent.com/112771723/190867028-4813147e-7f2a-4a90-a8b6-181d5b5c5297.png">
 <img width="544" alt="GET postman1" src="https://user-images.githubusercontent.com/112771723/190867034-2ed945e0-6879-4eda-92e5-b16eece14e1c.png">
 
+### STEP 2: Frontend Creation: Installing a react app
+#### The package.json file in the Todo directory was edit.
+#### Proxy was also configure in the package,json file in the client directory
+#### Commands are;
+##### npx create-react-app client
+##### npm install concurrently --save-dev
+##### npm install
+##### vi package.json
+##### npm run dev
+<img width="484" alt="npx react nstalll successfully" src="https://user-images.githubusercontent.com/112771723/190867408-5428af86-a6f6-446d-9f89-69db24d54bdd.png">
+ nodemon --save-dev
+<img width="460" alt="install  npm concurrent and nodemod" src="https://user-images.githubusercontent.com/112771723/190867326-23ff9ed3-5eca-4638-b213-1d212b5c04fd.png">
+<img width="530" alt="proxy 5000 added" src="https://user-images.githubusercontent.com/112771723/190867630-06211699-7f85-410a-853f-ede6ad757e1a.png">
+<img width="773<img width="567" alt="app on brower port3000" src="https://user-images.githubusercontent.com/112771723/190867949-2a27123a-280a-4d18-a596-346a24dffc18.png">
+" alt="localhost 3000 npm run dev" src="https://user-images.githubusercontent.com/112771723/190867720-72fd6c17-47cf-4910-bcb6-4e19d2d57470.png">
+
+### Creating your React Components
+#### Commands are;
+##### cd client
+##### cd src
+##### mkdir components
+##### cd components
+<img width="665" alt="component file" src="https://user-images.githubusercontent.com/112771723/190867890-a143967d-abe2-44dd-9077-be4d3f7202cd.png">
+
+### Installing Axios
+#### Command;
+##### npm install axios
+<img width="376" alt="install axios" src="https://user-images.githubusercontent.com/112771723/190868052-67f67a45-c144-44c5-87e6-fb6903324937.png">
+
+### In components and src directory:
+#### Comamands are;
+##### cd src/components
+##### vi ListTodo.js
+##### vi App.js
+##### vi App.css
+##### vim index.css
+<img width="422" alt="scr" src="https://user-images.githubusercontent.com/112771723/190868310-5907edab-d220-491f-878c-0046f6dd84ff.png">
+
+### In Todo directory
+#### Command;
+##### npm run dev
+<img width="701" alt="end" src="https://user-images.githubusercontent.com/112771723/190868400-81ffe522-5a9f-4a56-8c1e-6de2b43af455.png">
+
+
 
 
 
