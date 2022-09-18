@@ -1,3 +1,4 @@
+## LEMP STACK IMPLEMENTATION
 ### Step 1. Installing nginx web server
 #### - Command: sudo apt install nginx
 <img width="482" alt="installing nginx" src="https://user-images.githubusercontent.com/112771723/189488337-a68cc254-8cfc-4758-a51c-45542b99537a.png">
