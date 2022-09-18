@@ -1,3 +1,4 @@
+## LAMP STACK IMPLEMENTATION
 ### Step 1. Installing apache2
 #### Command: sudo apt install apache2
 ![Installing Apache (2)](https://user-images.githubusercontent.com/112771723/188878330-90bf4017-030d-47cd-80ba-c0487383f530.png)
