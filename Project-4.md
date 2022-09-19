@@ -43,8 +43,13 @@
 ##### mkdir public && cd public
 ##### vi script.js
 ##### vi index.html
-<img width="389" alt="public script index" src="https://user-images.githubusercontent.com/112771723/191039784-4a469367-c156-43db-8f69-74ed2c1d6f1c.png"
+<img width="389" alt="public script index" src="https://user-images.githubusercontent.com/112771723/191040645-8e4c28b6-8e80-4608-9d45-5ae4aac819a8.png">
 
+### Starting the server
+#### Command: node server.js
+<img width="397" alt="node serving running 3300" src="https://user-images.githubusercontent.com/112771723/191040989-ee538c19-571f-4a1c-9cdc-0dfeb430430b.png">
+<img width="265" alt="broswer 1" src="https://user-images.githubusercontent.com/112771723/191041017-c648cbb2-3a18-41be-95d2-c8608afbe5cf.png">
+<img width="299" alt="end" src="https://user-images.githubusercontent.com/112771723/191041047-f5ccd32e-1f2e-41ab-8c49-580488abb8c5.png">
 
 
 
