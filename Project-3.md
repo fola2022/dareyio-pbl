@@ -1,8 +1,10 @@
 ## SIMPLE TO-DO APPLICATION ON MERN WEB STACK
 ### Step 1: Backend Configuration
-#### Commands are; 
-#####  sudo apt update
-#####  sudo apt upgrade
+#### Commands are;
+```
+  sudo apt update
+  sudo apt upgrade
+```
 #####  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 <img width="541" alt="sudo apt update and ungrade" src="https://user-images.githubusercontent.com/112771723/190863546-d3d38051-bd0f-4108-aeab-c54d1bbc12e7.png">
 <img width="775" alt="curl" src="https://user-images.githubusercontent.com/112771723/190863564-e2e6776e-4e4a-49fa-a4aa-83ccf4255998.png">
