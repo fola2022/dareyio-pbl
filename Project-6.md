@@ -87,17 +87,54 @@ sudo mount /dev/webdata-vg/logs-lv /var/log
 ```
 sudo rsync -av /home/recovery/logs/. /var/log
 ```
+<img width="488" alt="recover log folder" src="https://user-images.githubusercontent.com/112771723/193462775-16a38e26-4acb-41c7-a7f3-277ed3caead6.png">
+
 #### Updating the /etc/fstab file for the mount configuration to persist after restart of the server
 ##### Commands:
 ```
 sudo blkid
 sudo vi /etc/fstab
+sudo mount -a
+sudo systemctl daemon reload
+```
+<img width="509" alt="fstab" src="https://user-images.githubusercontent.com/112771723/193461539-fa71f807-735d-4b4c-9e54-00c4fffa58e6.png">
+<img width="405" alt="mount successfully on fstab" src="https://user-images.githubusercontent.com/112771723/193461667-a5434217-d727-4edc-8b01-4e5e665891df.png">
+<img width="405"<img width="473" alt="after mounting" src="https://user-images.githubusercontent.com/112771723/193461572-545b1e13-c6a1-4f1f-a9aa-d5b99ed3390b.png">
 
+### STEP 2: Prepare the Database Server
+### All step 1 procedure were repeated for the Database Server, but here, only one logical volume db-lv would be created and mount to /db directory instead of /var/www/html/
+#### Creating logical volumes db-lv 
+##### Commands:
+```
+sudo lvcreate -n db-lv -L 20G database-vg
+sudo lvs
+sudo lsblk
+```
+<img width="519" alt="logical volume created db" src="https://user-images.githubusercontent.com/112771723/193462092-e876268c-a6d3-4ee6-844e-7916b833b28f.png">
 
-<img width="405" alt="mount successfully on fstab" src="https://user-images.githubusercontent.com/112771723/193461169-4319a9d5-3fa4-4a03-bf81-4a0eb929280e.png">
+#### Using mkfs.ext4 to format the logical volumes with ext4 filesystem
+##### Command:
+```
+sudo mkdir /db
+sudo mkfs -t ext4 /dev/database-vg/db-lv 
+```
+<img width="499" alt="logical volume formated db" src="https://user-images.githubusercontent.com/112771723/193462450-831a4a6e-a1f1-49ae-a41e-b6b1e1c2ebd0.png">
 
+#### Mounting /var/www/html on apps-lv logical volume
+```
+sudo mount /dev/database-vg/db-lv /db
+```
+<img width="466" alt="logical v mounted db" src="https://user-images.githubusercontent.com/112771723/193462351-ea41bc1e-6d54-49f3-aa32-cc991cee9658.png">
 
-
+#### Updating the /etc/fstab file for the mount configuration to persist after restart of the server
+##### Commands:
+```
+sudo blkid
+sudo vi /etc/fstab
+sudo mount -a
+sudo systemctl daemon reload
+```
+<img width="437" alt="fstab db" src="https://user-images.githubusercontent.com/112771723/193462708-a113a0ab-7dbc-4e89-b2b0-5e370e459087.png">
 
 
 
