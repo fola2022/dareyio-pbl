@@ -30,5 +30,19 @@ sudo lvmdiskscan
 <img width="509" alt="lvm2 installed" src="https://user-images.githubusercontent.com/112771723/193456445-c07e7f81-d2db-4008-8321-6f8c0d4e5e81.png">
 <img width="308" alt="sudo lvmdiskscan" src="https://user-images.githubusercontent.com/112771723/193456402-a30c3251-4f2d-4a0c-9ba1-d8a4ab38937c.png">
 
+####  The 3 disks were marked as physical volumes (PVs) to be used by LVM, then volume group was also created
+##### Commands:
+```
+sudo pvcreate /dev/xvdf1 /dev/xvdg1 /dev/xvdh1
+sudo vgcreate webdata-vg /dev/xvdh1 /dev/xvdg1 /dev/xvdf1
+sudo pvs
+sudo vgs
+```
+<img width="492" alt="pvcreate" src="https://user-images.githubusercontent.com/112771723/193456739-6cb5d17e-a888-4ecd-ab80-50f9da2d1bf0.png">
+<img width="515" alt="volume group created" src="https://user-images.githubusercontent.com/112771723/193456781-af4c26fb-4a45-4424-ae27-6ab2d9815a40.png">
+
+
+
+
 
 
