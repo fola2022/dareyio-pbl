@@ -136,6 +136,148 @@ sudo systemctl daemon reload
 ```
 <img width="437" alt="fstab db" src="https://user-images.githubusercontent.com/112771723/193462708-a113a0ab-7dbc-4e89-b2b0-5e370e459087.png">
 
+### STEP 3: Install WordPress on your Web Server EC2
+#### Update repository and Install wget, Apache and it’s dependencies
+##### Command:
+```
+sudo yum -y update
+sudo yum -y install wget httpd php php-mysqlnd php-fpm php-json
+```
+<img width="513" alt="wget" src="https://user-images.githubusercontent.com/112771723/193463128-70ad1a49-511b-4844-98d4-780919014836.png">
+
+#### Starting Apache
+##### Commands:
+```
+sudo systemctl enable httpd
+sudo systemctl start httpd
+```
+<img width="515" alt="httpd running" src="https://user-images.githubusercontent.com/112771723/193463226-344154cf-9f87-4edd-9199-f3b7c31dee6a.png">
+
+####  Installing PHP and it’s dependencies
+##### Commands:
+```
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo yum install yum-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+sudo yum module list php
+sudo yum module reset php
+sudo yum module enable php:remi-7.4
+sudo yum install php php-opcache php-gd php-curl php-mysqlnd
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+setsebool -P httpd_execmem 1
+```
+<img width="511" alt="php installed" src="https://user-images.githubusercontent.com/112771723/193463452-24b074b2-3fcb-4406-98b1-91f267699f88.png">
+<img width="515" alt="php 2" src="https://user-images.githubusercontent.com/112771723/193463460-5023b34c-a22e-4dc7-b5d0-3b444ff1b5df.png">
+<img width="505" alt="php 3" src="https://user-images.githubusercontent.com/112771723/193463468-1aec05bd-72b0-4bfb-83c8-61b22fbd70cc.png">
+<img width="514" alt="php 4" src="https://user-images.githubusercontent.com/112771723/193463502-7614a5b5-917f-42ec-ad06-cd90831f705a.png">
+<img width="512" alt="php 5" src="https://user-images.githubusercontent.com/112771723/193463511-9df85223-0601-4686-8ec9-6fcb7194ad38.png">
+<img width="505" alt="php 6" src="https://user-images.githubusercontent.com/112771723/193463519-e021db11-9ac2-46a7-996a-a6c9a2572deb.png">
+<img width="517" alt="php running use" src="https://user-images.githubusercontent.com/112771723/193463582-a47429d5-8795-4683-8f91-a9baac951b7c.png">
+
+#### Restarting Apache
+##### Command
+```
+sudo systemctl restart httpd
+```
+#### Downloading wordpress and copy wordpress to var/www/html
+##### Commands:
+```
+ mkdir wordpress
+ cd wordpress
+ sudo wget http://wordpress.org/latest.tar.gz
+ sudo tar xzvf latest.tar.gz
+ sudo rm -rf latest.tar.gz
+ sudo cp wordpress/wp-config-sample.php wordpress/wp-config.php
+ sudo cp -R wordpress /var/www/html/
+ ```
+ <img width="509" alt="http wordpress sudo wget" src="https://user-images.githubusercontent.com/112771723/193463943-bccc9031-0f73-4669-a1b6-3675ca1e8b7e.png">
+<img width="370" alt="sudo tar x wordpress" src="https://user-images.githubusercontent.com/112771723/193463898-5df35a1c-f573-4570-8d96-47dbab37f40e.png">
+<img width="512" alt="html directory" src="https://user-images.githubusercontent.com/112771723/193464466-c0c31bbc-8f54-4975-bf14-61af63463e6b.png">
+
+#### Configuring SELinux Policies
+##### Commands
+```
+sudo chown -R apache:apache /var/www/html/wordpress
+sudo chcon -t httpd_sys_rw_content_t /var/www/html/wordpress -R
+sudo setsebool -P httpd_can_network_connect=1
+sudo setsebool -P htpd_can_network_connect_db 1
+```
+<img width="532" alt="selinux conf" src="https://user-images.githubusercontent.com/112771723/193464661-59465383-dbdb-4ef1-a2dd-7c7b6ee8c0cc.png">
+
+### STEP 4: Installing MySQL on DB Server EC2
+##### Commands:
+```
+sudo yum update
+sudo yum install mysql-server
+```
+<img width="419" alt="install mysql" src="https://user-images.githubusercontent.com/112771723/193464788-432dcee3-54b0-467e-9e1a-beebc6f11bd6.png">
+
+#### Verifying service is up and running
+##### Commands:
+```
+sudo systemctl restart mysqld
+sudo systemctl enable mysqld
+```
+<img width="518" alt="mysql running in db" src="https://user-images.githubusercontent.com/112771723/193465146-b54791bb-46c8-4e33-a895-c1f02a79fe53.png">
+
+### STEP 5: Configuring Database to work with WordPress
+##### Commands:
+```
+sudo mysql
+CREATE DATABASE wordpress;
+CREATE USER `myuser`@`<Web-Server-Private-IP-Address>` IDENTIFIED BY 'mypass';
+GRANT ALL ON wordpress.* TO 'myuser'@'<Web-Server-Private-IP-Address>';
+FLUSH PRIVILEGES;
+SHOW DATABASES;
+exit
+```
+<img width="509" alt="inside mysql db" src="https://user-images.githubusercontent.com/112771723/193465187-84231bc1-bb79-404f-9d92-6a290f473ab8.png">
+
+### STEP 6: Configuring WordPress to connect to remote database
+#### First, MySQL port 3306 was opened on DB Server EC2 and access was only allowed to the database server from the Web Server’s IP address
+#### Installing Mysql client
+##### Commands:
+```
+sudo yum install mysql-client
+sudo mysql -u admin -p -h <DB-Server-Private-IP-address>
+```
+<img width="503" alt="webser data use at the end of the project" src="https://user-images.githubusercontent.com/112771723/193465559-fa4bbf4a-4f93-4dd9-8fb4-1255c6a9ac7a.png">
+<img width="524" alt="mysql running in webserver" src="https://user-images.githubusercontent.com/112771723/193465500-e8510e22-feb1-4f66-a30a-0dc4bd7f0c74.png">
+<img width="456" alt="showdatabase" src="https://user-images.githubusercontent.com/112771723/193465540-77e10ba8-cac3-4ce7-9045-07dd1ec1739c.png">
+
+#### Changing permission and configuration so Apache could use WordPress
+#### Command:
+```
+sudo vi wp-config.php
+sudo systemctl restart hhtpd
+```
+<img width="517" alt="wp-conf webser use this" src="https://user-images.githubusercontent.com/112771723/193465892-26a4c318-974b-423f-a1ed-7f6915ab126d.png">
+
+#### Enabling TCP port 80 in Inbound Rules configuration for Web Server EC2. It was enabled from everywhere 0.0.0.0/0 
+<img width="629" alt="end" src="https://user-images.githubusercontent.com/112771723/193466012-763e6dba-3bc2-4f94-b329-176cb8396961.png">
+<img width="944" alt="end 2" src="https://user-images.githubusercontent.com/112771723/193466016-83e5b67b-a257-4256-ba03-b233cb1da41c.png">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
