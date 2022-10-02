@@ -41,6 +41,90 @@ sudo vgs
 <img width="492" alt="pvcreate" src="https://user-images.githubusercontent.com/112771723/193456739-6cb5d17e-a888-4ecd-ab80-50f9da2d1bf0.png">
 <img width="515" alt="volume group created" src="https://user-images.githubusercontent.com/112771723/193456781-af4c26fb-4a45-4424-ae27-6ab2d9815a40.png">
 
+#### Creating 2 logical volumes. apps-lv and logs-lv 
+##### Commands:
+```
+sudo lvcreate -n apps-lv -L 14G webdata-vg
+sudo lvcreate -n logs-lv -L 14G webdata-vg
+sudo lvs
+sudo vgdisplay -v #view complete setup - VG, PV, and LV
+sudo lsblk 
+```
+<img width="557" alt="logical volume created" src="https://user-images.githubusercontent.com/112771723/193459618-57c80282-7585-4ef8-8a46-7cbd3bc329c5.png">
+<img width="514" alt="complete setting 1" src="https://user-images.githubusercontent.com/112771723/193459742-485dcac6-934b-4610-9d77-f46b14e6e05f.png">
+<img width="504" alt="complete setting2" src="https://user-images.githubusercontent.com/112771723/193459763-80e8c9b3-4eb0-4a8e-b2ab-2a80f123a7e1.png">
+<img width="508" alt="complete setting3" src="https://user-images.githubusercontent.com/112771723/193459770-cefdf510-d12f-4a02-b79a-bd40dd16be9a.png">
+<img width="440" alt="complete setting 4" src="https://user-images.githubusercontent.com/112771723/193459777-4a199d60-38d6-4c8c-9236-8adcf4668ea7.png">
+
+#### Using mkfs.ext4 to format the logical volumes with ext4 filesystem
+##### Commands:
+```
+sudo mkfs -t ext4 /dev/webdata-vg/apps-lv
+sudo mkfs -t ext4 /dev/webdata-vg/logs-lv
+```
+<img width="497" alt="logical voume formated" src="https://user-images.githubusercontent.com/112771723/193459916-55ea9636-a30b-45de-85b6-b3fc75225ac5.png">
+
+#### Creating /var/www/html directory and /home/recovery/logs directory for backup of log data
+##### Commands:
+```
+sudo mkdir -p /home/recovery/logs
+sudo mkdir -p /home/recovery/logs
+```
+#### Backing up all the files in log directory /var/log
+##### Command:
+```
+sudo rsync -av /var/log/. /home/recovery/logs/
+```
+#### Mounting /var/www/html on apps-lv logical volume
+```
+sudo mount /dev/webdata-vg/apps-lv /var/www/html/
+sudo mount /dev/webdata-vg/logs-lv /var/log
+```
+<img width="466" alt="mounted" src="https://user-images.githubusercontent.com/112771723/193460772-5496f324-9bb8-48e3-bd28-8b998618551a.png">
+
+#### Restoring all files in log directoty /var/log
+#### Command:
+```
+sudo rsync -av /home/recovery/logs/. /var/log
+```
+#### Updating the /etc/fstab file for the mount configuration to persist after restart of the server
+##### Commands:
+```
+sudo blkid
+sudo vi /etc/fstab
+
+
+<img width="405" alt="mount successfully on fstab" src="https://user-images.githubusercontent.com/112771723/193461169-4319a9d5-3fa4-4a03-bf81-4a0eb929280e.png">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
