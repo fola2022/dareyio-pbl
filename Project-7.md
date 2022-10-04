@@ -136,7 +136,7 @@ sudo exportfs -arv
 
 ## STEP 2:  CONFIGURING THE DATABASE SERVER
 #### Installing mysql server and creating a database
-##### Command: `sudo apt install mysql-server -y
+##### Command: `sudo apt install mysql-server -y`
 <img width="510" alt="mysql installed on db" src="https://user-images.githubusercontent.com/112771723/193814597-9d8cfbd2-f96b-4bc0-a043-59c6e616955c.png">
 <img width="512" alt="config  mysql" src="https://user-images.githubusercontent.com/112771723/193815274-7421a1d9-6394-4430-8f6b-e44e9cd6bcb6.png">
 
@@ -175,8 +175,8 @@ setsebool -P httpd_execmem 1
 <img width="515" alt="apache 5" src="https://user-images.githubusercontent.com/112771723/193817723-f84ce3c8-f1dc-4ae2-9b30-f585b26bc42d.png">
 <img width="514" alt="apache 6<img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193818038-5867004c-4c91-4373-a132-69830dffff79.png">
 <img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193818139-ec1d00e3-79bb-44fc-97c4-48d1788f78e9.png">
-
-
+                                                                                                         
+                                                                                                                                              
 
 
 
