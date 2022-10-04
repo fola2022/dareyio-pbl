@@ -173,10 +173,8 @@ setsebool -P httpd_execmem 1
 <img width="514" alt="apache3" src="https://user-images.githubusercontent.com/112771723/193817653-220fdfe2-63a0-4d12-be9d-6ec25e17791b.png">
 <img width="512" alt="apache 4" src="https://user-images.githubusercontent.com/112771723/193817669-ce558c75-2c31-4306-8b7d-abba18e4781b.png">
 <img width="515" alt="apache 5" src="https://user-images.githubusercontent.com/112771723/193817723-f84ce3c8-f1dc-4ae2-9b30-f585b26bc42d.png">
-<img width="514" alt="apache 6<img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193818038-5867004c-4c91-4373-a132-69830dffff79.png">
-<img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193818139-ec1d00e3-79bb-44fc-97c4-48d1788f78e9.png">
-                                                                                                         
-                                                                                                                                             
+<img width="514" alt="apache 6<img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193818038-5867004c-4c91-4373-a132-69830dffff79.png">                                                                                                       
+<img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193820960-44392ff2-e562-45a1-be74-f499fdc9e335.png">
 
 
 
