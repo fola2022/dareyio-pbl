@@ -30,7 +30,7 @@ sudo mysql -p
 <img width="490" alt="php install" src="https://user-images.githubusercontent.com/112771723/189489377-da15dc67-8388-4529-8819-e97232db3003.png">
 
 ### Step 4. Configuring nginx to use PHP processor
-#### - Commands are: 
+#### - Commands: 
 ```
 sudo mkdir /var/www/projectLEMP
 sudo chown -R $USER:$USER /var/www/projectLEMP
