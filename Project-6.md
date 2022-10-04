@@ -75,7 +75,7 @@ sudo mkdir -p /home/recovery/logs
 ```
 sudo rsync -av /var/log/. /home/recovery/logs/
 ```
-#### Mounting /var/www/html on apps-lv logical volume
+#### Mounting app-lv and log-lv logical volumes on /var/www/html and /var/log directory repectively  
 ```
 sudo mount /dev/webdata-vg/apps-lv /var/www/html/
 sudo mount /dev/webdata-vg/logs-lv /var/log
