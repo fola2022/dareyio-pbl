@@ -1,5 +1,5 @@
 ## DEVOPS TOOLING WEBSITE SOLUTION
-#### Fours EC2 instance were used
+#### Four EC2 instance were used
 ##### One for NFS Server
 ##### Three webservers
 ##### One database server
@@ -44,5 +44,71 @@ sudo vgs
 ```
 <img width="519" alt="physical volume and volume group ceated" src="https://user-images.githubusercontent.com/112771723/193803137-7f60f9eb-f39a-41de-af5b-3312bcd66857.png">
 
-#### Creating 3 logical volumes. apps-lv, logs-lv and opt-lv
+#### Creating 3 logical volumes. lv-apps, lv-logs and lv-opt
+##### Commands:
+```
+sudo lvcreate -n lv-apps -L 9G webdata-vg
+sudo lvcreate -n lv-logs -L 9G webdata-vg
+sudo lvcreate -n lv-opt -L 9G webdata-vg
+sudo lvs
+```
+<img width="529" alt="logical volume" src="https://user-images.githubusercontent.com/112771723/193804879-dd6ee5d3-23ee-4ba6-96c0-c7bfbfebfd9e.png">
+
+#### Using mkfs.ext4 to format the logical volumes with ext4 filesystem
+##### Commands:
+```
+sudo mkfs -t xfs /dev/webdata-vg/lv-apps
+sudo mkfs -t xfs /dev/webdata-vg/lv-logs
+sudo mkfs -t xfs /dev/webdata-vg/lv-opt
+```
+<img width="499" alt="logical volume formartted mkfs -t" src="https://user-images.githubusercontent.com/112771723/193805383-0e6b249e-4ec1-4450-b0d4-e58b5f6e1645.png">
+
+#### Creating /mnt directory to mount logical volumes
+##### Commands:
+```
+sudo mkdir /mnt/apps
+sudo mkdir /mnt/logs
+sudo mkdir /mnt/opt
+```
+<img width="317" alt="mnt directory" src="https://user-images.githubusercontent.com/112771723/193806340-52e265d3-b8de-4889-945d-f56240057ad8.png">
+
+#### Mounting lv-apps, lv-logs and lv-opt logical volumes on /mnt directories  
+```
+sudo mount /dev/webdata-vg/lv-apps /mnt/apps
+sudo mount /dev/webdata-vg/lv-logs /mnt/logs
+sudo mount /dev/webdata-vg/lv-opt /mnt/opt
+```
+#### Updating the /etc/fstab file for the mount configuration to persist after restart of the server
+##### Commands:
+```
+sudo blkid
+sudo vi /etc/fstab
+sudo mount -a
+sudo systemctl daemon reload
+```
+<img width="512" alt="block id" src="https://user-images.githubusercontent.com/112771723/193809472-e0504835-dd90-45e0-9111-175e390c736d.png">
+<img width="654" alt="fstab" src="https://user-images.githubusercontent.com/112771723/193809534-dab1b010-ee4c-42ce-bdf5-32c13faa2b26.png">
+<img width="478" alt="successfully mounted fstab" src="https://user-images.githubusercontent.com/112771723/193809565-8f9bb42b-ff3e-4b29-b337-fe32a0c6fde0.png">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
