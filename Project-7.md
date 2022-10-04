@@ -90,9 +90,91 @@ sudo systemctl daemon reload
 <img width="654" alt="fstab" src="https://user-images.githubusercontent.com/112771723/193809534-dab1b010-ee4c-42ce-bdf5-32c13faa2b26.png">
 <img width="478" alt="successfully mounted fstab" src="https://user-images.githubusercontent.com/112771723/193809565-8f9bb42b-ff3e-4b29-b337-fe32a0c6fde0.png">
 
+### Installing NFS server
+##### Commands:
+```
+sudo yum -y update
+sudo yum install nfs-utils -y
+sudo systemctl start nfs-server.service
+sudo systemctl enable nfs-server.service
+sudo systemctl status nfs-server.service
+```
+<img width="514" alt="nfs conf 1 yum update" src="https://user-images.githubusercontent.com/112771723/193810597-0e57bb22-0762-48fc-9cfb-9a90ddb33663.png">
+<img width="524" alt="nfs conf  2" src="https://user-images.githubusercontent.com/112771723/193810670-682093af-5b35-411b-8d19-5cf666b570ea.png">
+<img width="514" alt="nfs conf  345" src="https://user-images.githubusercontent.com/112771723/193810704-3a1d61bf-7a63-4e63-91e4-1559ca06ac88.png">
 
+#### Webservers subnet cidr was exported to connect as clients. That's three Web Servers would be install inside the same subnet
+#### Permission that would allow the three Web servers to read, write and execute files on NFS were set.
+##### Commands:
+```
+sudo chown -R nobody: /mnt/apps
+sudo chown -R nobody: /mnt/logs
+sudo chown -R nobody: /mnt/opt
+sudo chmod -R 777 /mnt/apps
+sudo chmod -R 777 /mnt/logs
+sudo chmod -R 777 /mnt/opt
+sudo systemctl restart nfs-server.service
+```
+<img width="490" alt="set pernission nfs" src="https://user-images.githubusercontent.com/112771723/193812952-e2b0da34-a32c-4c63-b4d6-277d95f10f9c.png">
 
+#### Configuring access to NFS for clients within the same subnet 
+##### Commands:
+```
+sudo vi /etc/exports
 
+/mnt/apps <Subnet-CIDR>(rw,sync,no_all_squash,no_root_squash)
+/mnt/logs <Subnet-CIDR>(rw,sync,no_all_squash,no_root_squash)
+/mnt/opt <Subnet-CIDR>(rw,sync,no_all_squash,no_root_squash)
+sudo exportfs -arv
+```
+<img width="504" alt="config subnet in vi etc nfs" src="https://user-images.githubusercontent.com/112771723/193813555-0ad9f2ec-c244-4509-9b92-c1d247d40c0e.png">
+<img width="475" alt="confi  access nfs" src="https://user-images.githubusercontent.com/112771723/193813585-822ffba4-d041-48ff-9569-eb65dbdc9031.png">
+
+#### Checking NFS Port also in order for NFS server to be accessible from client server, the following ports were opened TCP 111, UDP 111, UDP 2049
+##### Command `rpcinfo -p | grep nfs`
+<img width="337" alt="nfs port" src="https://user-images.githubusercontent.com/112771723/193813860-2b7b5e04-b147-4f9c-9af8-c7210d2c5dee.png">
+
+## STEP 2:  CONFIGURING THE DATABASE SERVER
+#### Installing mysql server and creating a database
+##### Command: `sudo apt install mysql-server -y
+<img width="510" alt="mysql installed on db" src="https://user-images.githubusercontent.com/112771723/193814597-9d8cfbd2-f96b-4bc0-a043-59c6e616955c.png">
+<img width="512" alt="config  mysql" src="https://user-images.githubusercontent.com/112771723/193815274-7421a1d9-6394-4430-8f6b-e44e9cd6bcb6.png">
+
+## STEP 3:  Preparing the Web Servers
+#### Installing NFS client
+##### Command: `sudo yum install nfs-utils nfs4-acl-tools -y`
+<img width="515" alt="nfs client installed on webserver1" src="https://user-images.githubusercontent.com/112771723/193816640-abd8823b-692d-443b-86f8-eade0d6c943c.png">
+
+#### Mount /var/www and target the NFS server’s export for apps
+##### Commands:
+```
+sudo mkdir /var/www
+sudo mount -t nfs -o rw,nosuid <NFS-Server-Private-IP-Address>:/mnt/apps /var/www
+sudo vi /etc/fstab
+<NFS-Server-Private-IP-Address>:/mnt/apps /var/www nfs defaults 0 0
+```
+<img width="523" alt="nfs mounted succ on webse1 use" src="https://user-images.githubusercontent.com/112771723/193816718-437d7404-bd76-42af-ae86-1f3848b6ce15.png">
+
+#### Installing Remi’s repository, Apache and PHP
+##### Commands:
+```
+sudo yum install httpd -y
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+sudo dnf module reset php
+sudo dnf module enable php:remi-7.4
+sudo dnf install php php-opcache php-gd php-curl php-mysqlnd
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+setsebool -P httpd_execmem 1
+```
+<img width="520" alt="apache installed webser1 1" src="https://user-images.githubusercontent.com/112771723/193817575-9151b5c4-5e8c-4e30-aa95-a3a8b18eacb3.png">
+<img width="523" alt="2" src="https://user-images.githubusercontent.com/112771723/193817633-2ab9a650-392a-437a-ae29-d0f0437eb532.png">
+<img width="514" alt="apache3" src="https://user-images.githubusercontent.com/112771723/193817653-220fdfe2-63a0-4d12-be9d-6ec25e17791b.png">
+<img width="512" alt="apache 4" src="https://user-images.githubusercontent.com/112771723/193817669-ce558c75-2c31-4306-8b7d-abba18e4781b.png">
+<img width="515" alt="apache 5" src="https://user-images.githubusercontent.com/112771723/193817723-f84ce3c8-f1dc-4ae2-9b30-f585b26bc42d.png">
+<img width="514" alt="apache 6<img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193818038-5867004c-4c91-4373-a132-69830dffff79.png">
+<img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193818139-ec1d00e3-79bb-44fc-97c4-48d1788f78e9.png">
 
 
 
