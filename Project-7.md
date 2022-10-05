@@ -130,7 +130,7 @@ sudo exportfs -arv
 <img width="504" alt="config subnet in vi etc nfs" src="https://user-images.githubusercontent.com/112771723/193813555-0ad9f2ec-c244-4509-9b92-c1d247d40c0e.png">
 <img width="475" alt="confi  access nfs" src="https://user-images.githubusercontent.com/112771723/193813585-822ffba4-d041-48ff-9569-eb65dbdc9031.png">
 
-#### Checking NFS Port also in order for NFS server to be accessible from client server, the following ports were opened TCP 111, UDP 111, UDP 2049
+#### Checking NFS Port in order for NFS server to be accessible from client server, the following ports were opened TCP 111, UDP 111, UDP 2049
 ##### Command `rpcinfo -p | grep nfs`
 <img width="337" alt="nfs port" src="https://user-images.githubusercontent.com/112771723/193813860-2b7b5e04-b147-4f9c-9af8-c7210d2c5dee.png">
 
@@ -214,6 +214,40 @@ sudo vi /etc/sysconfig/selinux
 ```
 <img width="522" alt="setenforce" src="https://user-images.githubusercontent.com/112771723/194043532-7d4e7480-e22a-4f1d-8b14-30c6f44f27ee.png">
                                                                                                                         
-                                                                                                                                                 
-                                                                                                                                                 
-                                                                                                                                                 
+###  Updating the website’s configuration to connect to the database
+##### Command:
+```
+sudo vi /var/www/html/functions.php 
+mysql -h <databse-private-ip> -u <db-username> -p <db-pasword> < tooling-db.sql
+```                                                                                                                                            
+<img width="506" alt="function php" src="https://user-images.githubusercontent.com/112771723/194058207-712152f6-06b7-4f42-88cf-2e3b2421e1ff.png">
+                                                                                                                                  
+### On broswer
+<img width="765" alt="result" src="https://user-images.githubusercontent.com/112771723/194063796-501d2a93-307f-4725-bfac-145ef2dec015.png">
+<img width="877" alt="end" src="https://user-images.githubusercontent.com/112771723/194064455-cabf8199-1bdf-4a47-af86-989c5090e43c.png">
+                                                                                                                      
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                   
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                 
+                                                                                                                                     
