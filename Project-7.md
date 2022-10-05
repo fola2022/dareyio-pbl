@@ -155,7 +155,8 @@ sudo vi /etc/fstab
 ```
 <img width="523" alt="nfs mounted succ on webse1 use" src="https://user-images.githubusercontent.com/112771723/193816718-437d7404-bd76-42af-ae86-1f3848b6ce15.png">
 
-#### Installing Remi’s repository, Apache and PHP
+### Installing Remi’s repository, Apache and PHP
+
 ##### Commands:
 ```
 sudo yum install httpd -y
@@ -176,19 +177,43 @@ setsebool -P httpd_execmem 1
 <img width="514" alt="apache 6<img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193818038-5867004c-4c91-4373-a132-69830dffff79.png">                                                                                                       
 <img width="515" alt="apache remaing" src="https://user-images.githubusercontent.com/112771723/193820960-44392ff2-e562-45a1-be74-f499fdc9e335.png">
 
-#
+### All above steps in step 3 were repeated for the other two webservers
 
-#####
+###  Verifying that Apache files and directories are available on the Web Server in /var/www and also on the NFS server in /mnt/apps.
+<img width="286" alt="tested" src="https://user-images.githubusercontent.com/112771723/194038584-fc88053d-dc11-4363-a8d7-8fc04bdfe4b0.png">
 
+### Locating and mounting log folder for Apache on webserver to NFS server’s export for log. Also making sure the mount point will persist after reboot
+##### Command:                                                                                                                                          
+```
+sudo mount -t nfs -o rw,nosuid <NFS-Server-Private-IP-Address>:/mnt/log /var/log/httpd
+sudo vi /etc/fstab
+<NFS-Server-Private-IP-Address>:/mnt/logs /var/log/httpd nfs defaults 0 0   
+```                                                                                                                                          
+<img width="521" alt="step repeat for log" src="https://user-images.githubusercontent.com/112771723/194039393-cb99edbd-7ae4-4626-8650-a2de82e6660d.png">
 
+### Source code was forked from Darey.io Github Account and Git was installed on the terminal
+##### Commands:
+```
+sudo yum install git
+sudo git init
+sudo git clone <source code forked from Darey.io Github account>
+```
+<img width="517" alt="git installed" src="https://user-images.githubusercontent.com/112771723/194041792-b232d512-8422-4729-991d-47dcc42af02f.png">
+<img width="514" alt="git clone use" src="https://user-images.githubusercontent.com/112771723/194041618-839d4f41-ad2e-435c-92a3-ce458de87dae.png">
 
-
-
-
-
-
-
-
-
-
-
+### Deploying the tooling website’s code to the Webserver
+##### Command: `sudo cp -R html/. /var/www/html`
+<img width="510" alt="Deploying tooling website" src="https://user-images.githubusercontent.com/112771723/194042599-86fbd6f7-e49d-470a-bbb9-12285d289771.png">
+                                                                                                                   
+#### Port 80 was open on the webserver
+#### Disabling SELinux 
+##### Commands:
+```
+sudo setenforce 0
+sudo vi /etc/sysconfig/selinux
+```
+<img width="522" alt="setenforce" src="https://user-images.githubusercontent.com/112771723/194043532-7d4e7480-e22a-4f1d-8b14-30c6f44f27ee.png">
+                                                                                                                        
+                                                                                                                                                 
+                                                                                                                                                 
+                                                                                                                                                 
