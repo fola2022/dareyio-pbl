@@ -37,6 +37,6 @@
 ![Installing php 2 (2)](https://user-images.githubusercontent.com/112771723/188884486-a63ed49d-78cc-4c85-acb5-f5b51ed47032.png)
 ![projectdevops](https://user-images.githubusercontent.com/112771723/188884612-d9617511-e9cf-4a98-b12d-5c33e499ca25.png)
 
-#### Checking Jenkins
+####  Jenkins
 
 
