@@ -54,7 +54,7 @@ sudo lvs
 ```
 <img width="529" alt="logical volume" src="https://user-images.githubusercontent.com/112771723/193804879-dd6ee5d3-23ee-4ba6-96c0-c7bfbfebfd9e.png">
 
-#### Using mkfs.ext4 to format the logical volumes with ext4 filesystem
+#### Using mkfs xfs to format the logical volumes with ext4 filesystem
 ##### Commands:
 ```
 sudo mkfs -t xfs /dev/webdata-vg/lv-apps
