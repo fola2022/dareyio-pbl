@@ -1,5 +1,5 @@
 ## CONTINIOUS INTEGRATION PIPELINE FOR TOOLING WEBSITE USING JENKINS
-### INSTALLING AND CONFIGURING JENKINS SERVER
+### STEP 1: INSTALLING AND CONFIGURING JENKINS SERVER
 #### First install JDK because Jenkins is a Java-based application
 ##### Command:
 ```
@@ -30,6 +30,10 @@ sudo systemctl status jenkins
 
 #### TCP port 8080 was opened in the inbound rule because by default, Jenkins use port TCP port 8080
 ##### Jenkins was access on the broswer using  http://<Jenkins-Server-Public-IP-Address>:8080
-##### The below code was run on the terminal in order to rectrive the Jenkins password
+##### The below code was run on the terminal in order to retrive the Jenkins password for login
 ##### Command: `sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
+    
+### STEP 2: CONFIGURING JENKINS TO RETRIEVE SOURCE CODES FROM GITHUB USING WEBHOOKS
+#### Webhook was enabled in the github repository and the payload URL was edited with the jenkins server Public IP Address
+#### In Jenkins console, a freestyle project was created and configured by linking the URL of the github repository to Jenkins so that Jenkins could access the files in the repository    
   
