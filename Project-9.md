@@ -35,5 +35,26 @@ sudo systemctl status jenkins
     
 ### STEP 2: CONFIGURING JENKINS TO RETRIEVE SOURCE CODES FROM GITHUB USING WEBHOOKS
 #### Webhook was enabled in the github repository and the payload URL was edited with the jenkins server Public IP Address
+<img width="929" alt="webhook added" src="https://user-images.githubusercontent.com/112771723/194881623-abe69bba-4180-46a2-952f-70cdb8e14bdc.png">
+    
 #### In Jenkins console, a freestyle project was created and configured by linking the URL of the github repository to Jenkins so that Jenkins could access the files in the repository    
-  
+ ### Running the build using 'Build Now' in Jenkins. The console output was not successfulat at first but i figured out the error. The issue was from my configuration on the Jenkins, the Github branch was in master, so i changed it to main. The first picture below is the #1 build (failed). The second picture is the successful build.
+<img width="943" alt="jenskin item build" src="https://user-images.githubusercontent.com/112771723/194882020-ee47a6ee-cf25-47ec-a436-e0a596d70c88.png">
+<img width="344" alt="jenkinsandgit" src="https://user-images.githubusercontent.com/112771723/194884364-a7e8960f-d710-4543-a307-8a2b1ba5025b.png">
+
+#### The project was configured by adding two more configuration, which are Github hook trigger for GITScm polling under "Build Triggers" and "Post-build Action" 
+#### After making changes in README file
+<img width="276" alt="jenkins build" src="https://user-images.githubusercontent.com/112771723/194885625-ab488599-ac5f-4ac7-a2e0-c43d9902e96d.png">
+<img width="289" alt="build successful" src="https://user-images.githubusercontent.com/112771723/194885954-d9829456-8356-453a-bd4b-fc8d23442092.png">
+    
+ #### CONFIGURing JENKINS TO COPY FILES TO NFS SERVER VIA SSH
+ #### "Publish Over SSH" plugin was installed to Jenkins
+ #### The Publish over SSH plugin  was configured to be able to connect to the NFS server
+ #### After adding "Send build artifacts over SSH" to the Post-build configuration, the build console output became unstable. Then, i figured i have to change the permission on the NFS server. After changing permission, the console output was successful.
+<img width="487" alt="nfs connected to jenkins" src="https://user-images.githubusercontent.com/112771723/194888484-aa41a898-6ccd-4225-8e71-28225cad5138.png">
+<img width="289" alt="build successful" src="https://user-images.githubusercontent.com/112771723/194888166-dddcdd3d-e7a0-4b20-b3a0-e44cadf91be7.png">
+<img width="492" alt="cat readme" src="https://user-images.githubusercontent.com/112771723/194885927-5ff9d869-96cd-4777-addb-e62557182348.png">
+
+    
+
+    
