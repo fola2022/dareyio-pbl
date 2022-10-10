@@ -47,7 +47,7 @@ sudo systemctl status jenkins
 <img width="276" alt="jenkins build" src="https://user-images.githubusercontent.com/112771723/194885625-ab488599-ac5f-4ac7-a2e0-c43d9902e96d.png">
 <img width="289" alt="build successful" src="https://user-images.githubusercontent.com/112771723/194885954-d9829456-8356-453a-bd4b-fc8d23442092.png">
     
- #### CONFIGURing JENKINS TO COPY FILES TO NFS SERVER VIA SSH
+ #### CONFIGURING JENKINS TO COPY FILES TO NFS SERVER VIA SSH
  #### "Publish Over SSH" plugin was installed to Jenkins
  #### The Publish over SSH plugin  was configured to be able to connect to the NFS server
  #### After adding "Send build artifacts over SSH" to the Post-build Action configuration, the build console output became unstable. Then, i figured i have to change the permission on the NFS server. After changing permission, the console output was successful.
