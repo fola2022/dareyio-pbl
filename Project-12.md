@@ -1,6 +1,6 @@
 # ANSIBLE REFACTORING AND STATIC ASSIGNMENTS (IMPORTS AND ROLES)
 ### This is a continuation of Project 11 Ansible-Config-mgt repository
-### Link
+### [This is the link to project 12 repository](https://github.com/fola2022/Ansible-Config-mgt.git)
 ### First, directory called ansible-config-artifact was created on the jenkin-ansible server to store all artifacts after each build in other to save space on the server and Jenkins was configured to copy artifact and a new freestyle project called save_artifact was created as the downstream project for ansible project.
 ##### Command: 
 ```
