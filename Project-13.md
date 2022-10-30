@@ -24,7 +24,7 @@
   ```
   
   #### The site.yml file in playbooks directory was updated 
-  ```
+```
   ---
 - hosts: all
 - name: Include dynamic variables 
@@ -37,7 +37,15 @@
 -  hosts: webservers
 - name: Webserver assignment
   import_playbook: ../static-assignments/webservers.yml
-  ```
-  ##### Mysql role was installed using the ansible galaxy role
-  #### 
-  
+```
+  #### Mysql role was installed using the ansible galaxy role
+  #### All process was uploaded to github
+```
+git add .
+git commit -m "Commit new role files into GitHub"
+git push --set-upstream origin roles-feature
+```
+### LOAD BALANCER ROLES
+#### To choose which Load Balancer to use, Nginx or Apache, two roles were installed respectively
+
+
