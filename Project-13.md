@@ -91,7 +91,7 @@ ansible-playbooks -i inventory/uat.yml playbooks/site.yml
 <img width="942" alt="end" src="https://user-images.githubusercontent.com/112771723/198901996-e0784d9e-3778-40e8-970a-14b7018fa3f8.png">
 <img width="688" alt="end2" src="https://user-images.githubusercontent.com/112771723/198902010-1fe01368-af01-4bef-9b7a-c4e7a335c379.png">
 
-#### Checked apache to see apache running on the loadbalancer instance
+#### Checked to confirm apache running on the loadbalancer instance
 <img width="690" alt="apache" src="https://user-images.githubusercontent.com/112771723/198902068-f19e3011-10e0-4e40-8344-bdcbfcb5b83e.png">
 
 
