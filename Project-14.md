@@ -1,4 +1,4 @@
-# EXPERIENCE CONTINUOUS INTEGRATION WITH JENKINS | ANSIBLE | ARTIFACTORY | SONARQUBE | PHP
+# CONTINUOUS INTEGRATION WITH JENKINS | ANSIBLE | ARTIFACTORY | SONARQUBE | PHP
 [Link to the repository](https://github.com/fola2022/Ansible-Config-mgt/tree/main/roles)
 #### The concept of CI/CD was implemented in this project, in which the PHP application from github are pushed to Jenkins to run a multi-branch pipeline job. Blue open plugin was installed in the Jenkins UI and use to view build jobs run on each branches of the repository simultaneously. This is done in order to achieve continuous integration of codes from different developers. After which the artifacts from the build job was packaged and pushed to sonarqube server for testing before it is deployed to artifactory in which ansible job is triggered to deploy the application to production environment.
 <img width="907" alt="blueocean" src="https://user-images.githubusercontent.com/112771723/202173874-6fd90728-53b2-412b-8ab1-76fa61289ab8.png">
@@ -18,7 +18,7 @@
 #### - Using the generated Github access token to get access to the repository 
 #### - Selecting Ansible-Config-mgt repository to create a new pipeline
 
-### STEP 2: Jenkins, Ansible, PHP and Composer installation on the Instance
+### STEP 2: Jenkins, PHP and Composer installation on the Instance
 #### Step 2.1: Commands to install Jenkins and it dependencies
 ```
 sudo wget -O /etc/yum.repos.d/jenkins.repo \
@@ -49,22 +49,7 @@ sudo systemctl enable jenkins
 sudo systemctl status jenkins
 sudo systemctl daemon-reload
 ```
-#### Step 2.2: Commands to install Ansible and it dependencies
-```
-sudo yum install ansible -y
-ansible --version
-python3 -m pip install --upgrade setuptools
-python3 -m pip install --upgrade pip
-python3 -m pip install PyMySQL
-python3 -m pip install mysql-connector-python
-python3 -m pip install psycopg2==2.7.5 --ignore-installed
-ansible-galaxy collection install community.postgresql
-```
-<img width="945" alt="ansible installed" src="https://user-images.githubusercontent.com/112771723/202183336-8fe64a51-6948-460e-9f39-b2248f1473db.png">
-<img width="692" alt="ansible version" src="https://user-images.githubusercontent.com/112771723/202183582-261de62a-7476-432e-80d3-38e2bcff2a06.png">
-<img width="947" alt="ansible collection" src="https://user-images.githubusercontent.com/112771723/202187481-70a6fc10-ebe2-4865-97f1-0049bd39b403.png">
-
-#### Step 2.3: Commands to install PHP
+#### Step 2.2: Commands to install PHP
 ```
 yum module reset php -y
 yum module enable php:remi-7.4 -y
@@ -76,14 +61,14 @@ systemctl enable php-fpm
 <img width="949" alt="php install 2" src="https://user-images.githubusercontent.com/112771723/202185653-13f77291-2065-481b-95b4-b613d1f554b1.png">
 <img width="565" alt="php active and running status" src="https://user-images.githubusercontent.com/112771723/202185736-6f4c6775-7a44-418f-9b7f-6367018c4615.png">
 
-#### Step 2.4: Commands to install Composer
+#### Step 2.3: Commands to install Composer
 ```
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/bin/composer
 ```
 <img width="518" alt="composer" src="https://user-images.githubusercontent.com/112771723/202185844-a593d1c2-2caa-4adf-b30f-f7d29080b93e.png">
 
-### STEP 3
+### STEP 3: CREATING DEPLOY DIRECTORY AND BUILD ON JENKINS
 #### A new directory "Deploy" was created in the Ansible-config-mgt and a file named "Jenkinsfile was created in it.
 ```
 mkdir deploy
@@ -113,6 +98,31 @@ pipeline {
 
 #### A new git branch "feature/jenkinspipeline-stages" was created and use for the build. 
 #### The following code was added to the Jenkinsfile to create more stages and make the new branch show up in Jenkins, scan the repository was done.
+```
+pipeline {
+  agent any
+
+  stages {
+    stage('Build') {
+      steps {
+        script {
+          sh 'echo "Building Stage"'
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        script {
+          sh 'echo "Testing Stage"'
+        }
+      }
+    }
+```
+#### The branch was merged with the main branch
+<img width="898" alt="after merging main branch" src="https://user-images.githubusercontent.com/112771723/202203534-84a63564-e065-4df4-81fc-25dec0815a7e.png">
+
+### More stages were added and git push was done
 ```
 pipeline {
   agent any
@@ -168,18 +178,68 @@ git push
 ```
 ![build](https://user-images.githubusercontent.com/112771723/202197718-de9bfb81-d7bf-44e8-951e-374d22c80798.png)
 
-
-
-
-
-
-
-
-
-
-
-
+### STEP 4: RUNNING ANSIBLE PLAYBOOK FROM JENKINS
+#### Step 4.1 Commands to install Ansible and it dependencies on Jenkins server and Ansible plugin in Jenkins UI
 ```
+sudo yum install ansible -y
+ansible --version
+python3 -m pip install --upgrade setuptools
+python3 -m pip install --upgrade pip
+python3 -m pip install PyMySQL
+python3 -m pip install mysql-connector-python
+python3 -m pip install psycopg2==2.7.5 --ignore-installed
+ansible-galaxy collection install community.postgresql
+```
+<img width="945" alt="ansible installed" src="https://user-images.githubusercontent.com/112771723/202183336-8fe64a51-6948-460e-9f39-b2248f1473db.png">
+<img width="692" alt="ansible version" src="https://user-images.githubusercontent.com/112771723/202183582-261de62a-7476-432e-80d3-38e2bcff2a06.png">
+<img width="947" alt="ansible collection" src="https://user-images.githubusercontent.com/112771723/202187481-70a6fc10-ebe2-4865-97f1-0049bd39b403.png">
+
+#### After installing Ansible plugin in Jenkins UI, all the codes in Jenkinsfile was deleted to start from the scratch
+#### For ansible to be able to locate the roles in the playbook, the ansible.cfg filw was created in the deploy directory and then exported from the Jenkinsfile code which runs with tags 'webserver'.
+<img width="928" alt="ansible cfg file" src="https://user-images.githubusercontent.com/112771723/202206106-ffa130c2-0a36-4e7a-80fc-06f108be750f.png">
+
+#### Using the jenkins pipeline syntax Ansible tool to generate syntax for executing playbook
+![pipeline syntax 1](https://user-images.githubusercontent.com/112771723/202209114-96cb953a-254e-4e8c-ab6a-01d9d76a9863.png)
+![pipeline systax ansible 2](https://user-images.githubusercontent.com/112771723/202209454-b1597067-18e0-42a2-8e15-7ad0a520671e.png)
+![pipeline systax ansible 3](https://user-images.githubusercontent.com/112771723/202209781-051ad4fa-2165-4673-ab14-732d2572ea27.png)
+
+#### Updating Jenkinsfile to introduce parameterization
+```
+pipeline {
+    agent any
+
+    parameters {
+      string(name: 'inventory', defaultValue: 'dev.yml',  description: 'This is the inventory file for the environment to deploy configuration')
+    }
+
+  stages {
+    stage("Initial Clean Up") {
+      steps {
+        dir("${WORKSPACE}") {
+           deleteDir()
+        }
+      }
+    }
+
+    stage('SCM Checkout') {
+      steps {
+        git branch: 'main', url: 'https://github.com/fola2022/ansible-config-mgt.git'
+      }
+    }
+    
+    stage('Execute Playbook') {
+      steps {
+        withEnv(['ANSIBLE_CONFIG = ${WORKSPACE}/deploy/.ansible.cfg']) {
+          ansiblePlaybook credentialsId: 'private-key', disableHostKeyChecking: true, installation: 'ansible2', inventory: 'inventory/${inventory}', playbook: 'playbooks/site.yml', tags: 'webservers'
+        }
+      }
+    }
+  }
+}
+```
+
+
+
 
 
 
