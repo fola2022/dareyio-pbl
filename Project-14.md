@@ -51,9 +51,8 @@ sudo systemctl daemon-reload
 ```
 #### Commands to install Ansible and it dependencies
 ```
-sudo apt update
-sudo apt install ansible
-sudo ansible --version
+sudo yum install ansible -y
+ansible --version
 python3 -m pip install --upgrade setuptools
 python3 -m pip install --upgrade pip
 python3 -m pip install PyMySQL
