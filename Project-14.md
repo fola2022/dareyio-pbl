@@ -8,7 +8,7 @@
 ##### MySql database (Redhat)
 ##### Nginx
 ##### SonarQube
-##### Artifactory
+##### Artifactory (Ubuntu)
 
 
 ### STEP 1: Configuring Ansible For Jenkins Deployment
@@ -18,7 +18,7 @@
 #### - Using the generated Github access token to get access to the repository 
 #### - Selecting Ansible-Config-mgt repository to create a new pipeline
 
-### STEP 2: Jenkins, PHP and Composer installation on the Instance
+### STEP 2: Jenkins installation on the Instance
 #### Step 2.1: Commands to install Jenkins and it dependencies
 ```
 sudo wget -O /etc/yum.repos.d/jenkins.repo \
@@ -49,25 +49,6 @@ sudo systemctl enable jenkins
 sudo systemctl status jenkins
 sudo systemctl daemon-reload
 ```
-#### Step 2.2: Commands to install PHP
-```
-yum module reset php -y
-yum module enable php:remi-7.4 -y
-yum install -y php php-common php-mbstring php-opcache php-intl php-xml php-gd php-curl php-mysqlnd php-fpm php-json
-systemctl start php-fpm
-systemctl enable php-fpm
-```
-<img width="947" alt="php install 1" src="https://user-images.githubusercontent.com/112771723/202185588-13c71402-8f43-4de1-9136-b1184129c162.png">
-<img width="949" alt="php install 2" src="https://user-images.githubusercontent.com/112771723/202185653-13f77291-2065-481b-95b4-b613d1f554b1.png">
-<img width="565" alt="php active and running status" src="https://user-images.githubusercontent.com/112771723/202185736-6f4c6775-7a44-418f-9b7f-6367018c4615.png">
-
-#### Step 2.3: Commands to install Composer
-```
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/bin/composer
-```
-<img width="518" alt="composer" src="https://user-images.githubusercontent.com/112771723/202185844-a593d1c2-2caa-4adf-b30f-f7d29080b93e.png">
-
 ### STEP 3: CREATING DEPLOY DIRECTORY AND BUILD ON JENKINS
 #### A new directory "Deploy" was created in the Ansible-config-mgt and a file named "Jenkinsfile was created in it.
 ```
@@ -237,9 +218,51 @@ pipeline {
   }
 }
 ```
+### STEP 5: CI/CD PIPELINE FOR TODO APPLICATION
+#### The goal here is to deploy the application onto servers directly from Artifactory rather than from git.
+#### First, Artifactory role was collected from ansible galaxy and installed into the Jenkins-ansible server
+<img width="550" alt="artifactory role" src="https://user-images.githubusercontent.com/112771723/202213905-ebd68cf5-cf90-42d7-a529-fc12476a7311.png">
 
+#### Step 5.1: Preparing Jenkins
+#### This repo was forked to mine
+```
+https://github.com/darey-devops/php-todo.git
+```
+#### Installed Jenkins plugins: 
+#### - Plot plugin: This will use to display tests reports, and code coverage information.
+#### - Artifactory plugin: This will be used to easily upload code artifacts into an Artifactory server. 
+#### In the Jenkins UI, Artifactory was configured in configure system
+### Installing PHP and Composer
+#### Commands to install PHP and it dependencies
+```
+yum module reset php -y
+yum module enable php:remi-7.4 -y
+yum install -y php php-common php-mbstring php-opcache php-intl php-xml php-gd php-curl php-mysqlnd php-fpm php-json
+systemctl start php-fpm
+systemctl enable php-fpm
+```
+<img width="947" alt="php install 1" src="https://user-images.githubusercontent.com/112771723/202185588-13c71402-8f43-4de1-9136-b1184129c162.png">
+<img width="949" alt="php install 2" src="https://user-images.githubusercontent.com/112771723/202185653-13f77291-2065-481b-95b4-b613d1f554b1.png">
+<img width="565" alt="php active and running status" src="https://user-images.githubusercontent.com/112771723/202185736-6f4c6775-7a44-418f-9b7f-6367018c4615.png">
 
+#### Step Commands to install Composer
+```
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/bin/composer
+```
+<img width="518" alt="composer" src="https://user-images.githubusercontent.com/112771723/202185844-a593d1c2-2caa-4adf-b30f-f7d29080b93e.png">
 
+#### Configure Artifactory in Jenkins UI
+#### - Clicked Manage Jenkins, click Configure System
+#### - Scroll down to JFrog, click Add Artifactory Server
+#### - Enter the Server ID as "artifactory-server"
+#### - Enter the URL as:
+```
+http://<artifactory-server-ip>:8082/artifactory
+```
+<img width="796" alt="artifactory on browser" src="https://user-images.githubusercontent.com/112771723/202221941-1bea7584-183e-4c95-9b68-79ecbfcd154b.png">
+
+### Step 5.2: Integrate Artifactory repository with Jenkins
 
 
 
