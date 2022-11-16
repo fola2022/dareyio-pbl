@@ -108,8 +108,65 @@ pipeline {
 }
 ```
 #### Step 3.1 Back to the Jenkins UI, Under Configure, Build configuration was done, entering the path to the Jenkinsfile, which is deploy/Jenkinsfile. Then a build was triggered by clicking on Build Now in the Jenkins UI.
-
 ![deploy-jenkinsfile](https://user-images.githubusercontent.com/112771723/202194600-7a5bf948-b934-4deb-ab77-2da26570d756.png)
+<img width="881" alt="main build on blue ocean" src="https://user-images.githubusercontent.com/112771723/202196459-bb9134c9-5950-4f53-a465-0f5f25fbbf7b.png">
+
+#### A new git branch "feature/jenkinspipeline-stages" was created and use for the build. 
+#### The following code was added to the Jenkinsfile to create more stages and make the new branch show up in Jenkins, scan the repository was done.
+```
+pipeline {
+  agent any
+
+  stages {
+    stage('Build') {
+      steps {
+        script {
+          sh 'echo "Building Stage"'
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        script {
+          sh 'echo "Testing Stage"'
+        }
+      }
+    }
+
+    stage('Package') {
+      steps {
+        script {
+          sh 'echo "Testing Stage"'
+        }
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        script {
+          sh 'echo "Testing Stage"'
+        }
+      }
+    }
+
+    stage('Clean up') {
+      steps {
+        script {
+          sh 'echo "Testing Stage"'
+        }
+      }
+    }
+  }
+}
+```
+### Git add, commit and push was done to push the new update
+```
+git add .
+git commit -m "commit message"
+git push
+```
+![build](https://user-images.githubusercontent.com/112771723/202197718-de9bfb81-d7bf-44e8-951e-374d22c80798.png)
 
 
 
