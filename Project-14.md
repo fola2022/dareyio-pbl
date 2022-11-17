@@ -5,8 +5,8 @@
 
 ### 5 EC2 Instances was used. They are;
 ##### Jenkins server (Redhat)
-##### MySql database (Redhat)
-##### Nginx
+##### Database server (Ubuntu)
+##### Webserver (Nginx) 
 ##### SonarQube
 ##### Artifactory (Ubuntu)
 
@@ -268,6 +268,9 @@ sudo mv composer.phar /usr/bin/composer
 http://<artifactory-server-ip>:8082/artifactory
 ```
 <img width="796" alt="artifactory on browser" src="https://user-images.githubusercontent.com/112771723/202221941-1bea7584-183e-4c95-9b68-79ecbfcd154b.png">
+<img width="612" alt="artifactory install" src="https://user-images.githubusercontent.com/112771723/202474041-5ad74dee-9f09-472d-aaf1-1ab6fefc2090.png">
+<img width="614" alt="artifactory install 2" src="https://user-images.githubusercontent.com/112771723/202474076-4e915625-26a3-47e8-8410-16a575715df5.png">
+
 
 ### Step 5.2: Integrate Artifactory repository with Jenkins
 #### Created a dummy Jenkinsfile in the root of the php-todo repo and in the Blue Ocean, I created a multibranch pipeline
@@ -280,6 +283,142 @@ GRANT ALL PRIVILEGES ON * . * TO 'homestead'@'%';
 #### Database connectivity requirements was updated in the file .env.sample
 <img width="182" alt="env  file " src="https://user-images.githubusercontent.com/112771723/202470274-157d62a9-5dc0-4064-adb1-473d3acdd17c.png">
 
+#### Updating the Jenkinsfile for the php-todo repository on the main branch
+```
+pipeline {
+    agent any
+
+  stages {
+
+     stage("Initial cleanup") {
+          steps {
+            dir("${WORKSPACE}") {
+              deleteDir()
+            }
+          }
+        }
+
+    stage('Checkout SCM') {
+      steps {
+            git branch: 'main', url: 'https://github.com/darey-devops/php-todo.git'
+      }
+    }
+
+    stage('Prepare Dependencies') {
+      steps {
+             sh 'mv .env.sample .env'
+             sh 'composer install'
+             sh 'php artisan migrate'
+             sh 'php artisan db:seed'
+             sh 'php artisan key:generate'
+      }
+    }
+  }
+}
+```
+<img width="905" alt="php jenkins and mysql" src="https://user-images.githubusercontent.com/112771723/202478237-952faa6f-67f8-4f85-a9fb-46192d4c6494.png">
+
+#### The required file by PHP is .env so was .env.sample renamed to .env
+#### Composer is used by PHP to install all the dependent libraries used by the application. PHP artisan uses the .env file to setup the required database objects.
+#### After successful run of this step, I login to the database server and run SHOW TABLES, to see the tables created.
+<img width="506" alt="mysql db" src="https://user-images.githubusercontent.com/112771723/202476490-869a4914-1978-47cb-bb87-19dc68eea12a.png">
+
 #### On database server, installing mysql: `sudo yum install mysql-server`
+
+<img width="620" alt="bind address change on db server" src="https://user-images.githubusercontent.com/112771723/202473840-8911a7fc-07f1-431d-81fa-a7382084a8be.png">
+
+#### Updating the Jenkinsfile to include Unit test
+```
+  stage('Execute Unit Tests') {
+      steps {
+             sh './vendor/bin/phpunit'
+      } 
+ ```
+ #### Adding Code Quality stage with phploc tool and will save the output in build/logs/phploc.csv:
+```
+stage('Code Analysis') {
+      steps {
+        sh 'phploc app/ --log-csv build/logs/phploc.csv'
+
+      }
+    }
+```
+### Code Analysis
+#### Updating the Jenkinsfile with code analysis stage. For PHP the most commonly tool used for code quality analysis is phploc
+```
+stage('Code Analysis') {
+  steps {
+        sh 'phploc app/ --log-csv build/logs/phploc.csv'
+
+  }
+}
+```
+#### Adding the plot code stage to the Jenkinsfile pipeline
+``
+ stage('Plot Code Coverage Report') {
+      steps {
+
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Lines of Code (LOC),Comment Lines of Code (CLOC),Non-Comment Lines of Code (NCLOC),Logical Lines of Code (LLOC)                          ', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'A - Lines of code', yaxis: 'Lines of Code'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Average Class Length (LLOC),Average Method Length (LLOC),Average Function Length (LLOC)', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'C - Average Length', yaxis: 'Average Lines of Code'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Directories,Files,Namespaces', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'B - Structures Containers', yaxis: 'Count'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Cyclomatic Complexity / Lines of Code,Cyclomatic Complexity / Number of Methods ', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'D - Relative Cyclomatic Complexity', yaxis: 'Cyclomatic Complexity by Structure'      
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Classes,Abstract Classes,Concrete Classes', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'E - Types of Classes', yaxis: 'Count'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Methods,Non-Static Methods,Static Methods,Public Methods,Non-Public Methods', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'F - Types of Methods', yaxis: 'Count'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Constants,Global Constants,Class Constants', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'G - Types of Constants', yaxis: 'Count'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Test Classes,Test Methods', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'I - Testing', yaxis: 'Count'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Logical Lines of Code (LLOC),Classes Length (LLOC),Functions Length (LLOC),LLOC outside functions or classes ', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'AB - Code Structure by Logical Lines of Code', yaxis: 'Logical Lines of Code'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Functions,Named Functions,Anonymous Functions', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'H - Types of Functions', yaxis: 'Count'
+            plot csvFileName: 'plot-396c4a6b-b573-41e5-85d8-73613b2ffffb.csv', csvSeries: [[displayTableFlag: true, exclusionValues: 'Interfaces,Traits,Classes,Methods,Functions,Constants', file: 'build/logs/phploc.csv', inclusionFlag: 'INCLUDE_BY_STRING', url: '']], group: 'phploc', numBuilds: '100', style: 'line', title: 'BB - Structure Objects', yaxis: 'Count'
+
+      }
+    }
+```    
+<img width="890" alt="code analysis on jenkins ui" src="https://user-images.githubusercontent.com/112771723/202480218-b128cfeb-c9b1-46a9-900d-3e7e495638bb.png">
+<img width="642" alt="phploc" src="https://user-images.githubusercontent.com/112771723/202481061-773ee5fc-d2c1-42e4-985f-29afd7ce76d4.png">
+
+#### Adding the package artifacts stage which archives the application code
+```
+    stage('Package Artifact') {
+      steps {
+            sh 'zip -qr php-todo.zip ${WORKSPACE}/*'
+      }
+    }
+```
+#### Uploading the artifacts to the Artifactory repository in this stage:
+
+    stage('Upload Artifact to Artifactory') {
+      steps {
+        script { 
+                def server = Artifactory.server 'artifactory'                 
+                def uploadSpec = """{
+                    "files": [
+                      {
+                       "pattern": "php-todo.zip",
+                       "target": "artifacts-todo-php",
+                       "props": "type=zip;status=ready"
+
+                      }
+                    ]
+                }""" 
+
+              server.upload spec: uploadSpec
+        }
+      }
+    }
+```
+<img width="872" alt="upload artifact" src="https://user-images.githubusercontent.com/112771723/202481673-92171fe3-086a-4197-b6e1-201c0f22e9e1.png">
+
+#### Deploying the application to the dev environment by launching Ansible pipeline job(ansible-config-mgt)
+```
+    stage ('Deploy to Dev Environment') {
+      steps {
+        build job: 'ansible-config-mgt/main', parameters: [[$class: 'StringParameterValue', name: 'env', value: 'dev']], propagate: false, wait: true
+      }
+    }
+```
+<img width="887" alt="Deploy to dev env" src="https://user-images.githubusercontent.com/112771723/202482807-8249aa0b-1400-4195-aef3-97ab52c41c3a.png">
+
+
+
 
 
