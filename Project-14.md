@@ -432,8 +432,10 @@ stage('Code Analysis') {
 #### Sonarqube installation was done by creating an ansible playbook role
 [Here is the link to the role in my repository](https://github.com/fola2022/Ansible-Config-mgt/tree/main/roles/sonarqube)
 <img width="518" alt="sonar install" src="https://user-images.githubusercontent.com/112771723/202494728-9aa2fac9-9e08-4280-95b5-380f445a398e.png">
+
 #### Access SonarQube on port 9000
 <img width="914" alt="sonarqube on broswer" src="https://user-images.githubusercontent.com/112771723/202494845-ace13659-41cf-444c-9045-fd35a184c28e.png">
+
 ### CONFIGURING SONARQUBE AND JENKINS FOR QUALITY GATE
 #### SonarScanner plugin was installed in the Jenkins UI
 #### Updating Jenkins Pipeline to include SonarQube scanning and Quality Gate
@@ -480,7 +482,7 @@ sonar.php.tests.reportPath=build/logs/junit.xml
 #### Reason for failure
 #### There are bugs, and there is 13.5% code coverage. (code coverage is a percentage of unit tests added by developers to test functions and objects in the code)
 
-#### Jenkinsfile was updated to implement the below code
+#### Assuming a basic gitflow implementation restricts only the develop branch to deploy code to Integration environment like sit. So that only branches other than develop, hotfix, release or main will be able to deploy the code. Jenkinsfile was updated to implement the below code
 ```
  stage('SonarQube Quality Gate') {
       when { branch pattern: "^develop*|^hotfix*|^release*|^main*", comparator: "REGEXP"}
