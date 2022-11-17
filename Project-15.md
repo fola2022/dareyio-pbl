@@ -227,6 +227,7 @@ systemctl restart httpd
 
 ####  DNS Records were created in The Route53 For the Tooling And Wordporess site
 #### The url https://www.tooling.yellowgem.tk was access on the broswer. The url route traffic from the application load balancer to the nginx and then to the internal ALB which forwards the traffic to the server for tooling site:
+[Link to the repository](https://github.com/fola2022/ACS-project-config)
 
 <img width="473" alt="end" src="https://user-images.githubusercontent.com/112771723/202563768-3d69d087-63d1-4e46-9d0c-8616dfb15927.png">
 
