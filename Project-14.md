@@ -230,7 +230,7 @@ pipeline {
 #### First, Artifactory role was collected from ansible galaxy and installed into the Jenkins-ansible server
 <img width="550" alt="artifactory role" src="https://user-images.githubusercontent.com/112771723/202213905-ebd68cf5-cf90-42d7-a529-fc12476a7311.png">
 
-#### Step 5.1: Preparing Jenkins
+### Step 5.1: Preparing Jenkins
 #### This repo was forked to mine
 ```
 https://github.com/darey-devops/php-todo.git
@@ -274,12 +274,20 @@ http://<artifactory-server-ip>:8082/artifactory
 
 ### Step 5.2: Integrate Artifactory repository with Jenkins
 #### Created a dummy Jenkinsfile in the root of the php-todo repo and in the Blue Ocean, I created a multibranch pipeline
+#### On database server, installing mysql:
+`sudo yum install mysql-server`
+<img width="597" alt="mysql running on db" src="https://user-images.githubusercontent.com/112771723/202486847-abe6f4d4-3829-4d27-86cc-dcef281e7933.png">
+
 #### Created a database and user on the database server
 ```
 Create database homestead;
 CREATE USER 'homestead'@'%' IDENTIFIED BY 'sePret^i';
 GRANT ALL PRIVILEGES ON * . * TO 'homestead'@'%';
 ```
+#### Configuring the bind_address in the my.cnf file:
+<img width="620" alt="bind address change on db server" src="https://user-images.githubusercontent.com/112771723/202473840-8911a7fc-07f1-431d-81fa-a7382084a8be.png">
+#### Port 3306 was opened in the database security group
+
 #### Database connectivity requirements was updated in the file .env.sample
 <img width="182" alt="env  file " src="https://user-images.githubusercontent.com/112771723/202470274-157d62a9-5dc0-4064-adb1-473d3acdd17c.png">
 
@@ -323,9 +331,7 @@ pipeline {
 #### After successful run of this step, I login to the database server and run SHOW TABLES, to see the tables created.
 <img width="506" alt="mysql db" src="https://user-images.githubusercontent.com/112771723/202476490-869a4914-1978-47cb-bb87-19dc68eea12a.png">
 
-#### On database server, installing mysql: `sudo yum install mysql-server`
 
-<img width="620" alt="bind address change on db server" src="https://user-images.githubusercontent.com/112771723/202473840-8911a7fc-07f1-431d-81fa-a7382084a8be.png">
 
 #### Updating the Jenkinsfile to include Unit test
 ```
