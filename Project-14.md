@@ -435,6 +435,67 @@ stage('Code Analysis') {
 #### Access SonarQube on port 9000
 <img width="914" alt="sonarqube on broswer" src="https://user-images.githubusercontent.com/112771723/202494845-ace13659-41cf-444c-9045-fd35a184c28e.png">
 ### CONFIGURING SONARQUBE AND JENKINS FOR QUALITY GATE
+#### SonarScanner plugin was installed in the Jenkins UI
+#### Updating Jenkins Pipeline to include SonarQube scanning and Quality Gate
+#### Quality Gate stage was added to the Jenkins pipline
+```
+ stage('SonarQube Quality Gate') {
+        environment {
+            scannerHome = tool 'SonarQubeScanner'
+        }
+        steps {
+            withSonarQubeEnv('sonarqube') {
+                sh "${scannerHome}/bin/sonar-scanner"
+            }
 
+        }
+    }
+ ```   
+#### The above step failed because i have not updated `sonar-scanner.properties
+#### Configuring sonar-scanner.properties – From the step above, Jenkins will install the scanner tool on the Linux server. Then, went into the tools directory on the server to configure the properties file in which SonarQube will require to function during pipeline execution.
+```
+cd /var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/SonarQubeScanner/conf/
+```
+#### Opened sonar-scanner.properties file
+```
+sudo vi sonar-scanner.properties
+```
+#### Added configuration related to php-todo project
+```
+sonar.host.url=http://<SonarQube-Server-IP-address>:9000
+sonar.projectKey=php-todo
+#----- Default source code encoding
+sonar.sourceEncoding=UTF-8
+sonar.php.exclusions=**/vendor/**
+sonar.php.coverage.reportPaths=build/logs/clover.xml
+sonar.php.tests.reportPath=build/logs/junit.xml
+```
+### Running The Pipeline Job 
+#### After pushing to github 
+![Screenshot (457)](https://user-images.githubusercontent.com/112771723/202499841-52fa9fea-8515-4af6-b6e2-df57b0a2986c.png)
 
+#### Result from the Sonaqube Server
+<img width="926" alt="sonar end" src="https://user-images.githubusercontent.com/112771723/202500317-4ec42882-1273-4982-8514-5b3b5e164a75.png">
 
+#### Reason for failure
+#### There are bugs, and there is 13.5% code coverage. (code coverage is a percentage of unit tests added by developers to test functions and objects in the code)
+
+#### Jenkinsfile was updated to implement the below code
+```
+ stage('SonarQube Quality Gate') {
+      when { branch pattern: "^develop*|^hotfix*|^release*|^main*", comparator: "REGEXP"}
+        environment {
+            scannerHome = tool 'SonarQubeScanner'
+        }
+        steps {
+            withSonarQubeEnv('sonarqube') {
+                sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonar-project.properties"
+            }
+            timeout(time: 1, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+    }
+  ```
+  [Short video of the pipeline](
+    
