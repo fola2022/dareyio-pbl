@@ -79,9 +79,22 @@ setsebool -P httpd_use_nfs 1
 ```
 ### STEP 3: Creating A Launch Template
 #### AMI is used to set up the launch template
-<img width="693" alt="launch template" src="https://user-images.githubusercontent.com/112771723/202540903-41ddb852-f615-4303-b53a-b9f78a240caa.png">
+### For Bastion Server
+#### - Setting up a launch template with the Bastion AMI
+#### - Ensuring the Instances are launched into the public subnet
+#### - Entering the Userdata to update yum package repository and install ansible and mysql
+```
+#!/bin/bash
+yum install -y mysql
+yum install -y git tmux
+yum install -y ansible
+```
+### For Nginx Server
+#### - Setting up a launch template with the Nginx AMI
+#### - Ensuring the Instances are launched into the public subnet
+#### - Assigning appropriate security group
+#### - Entering the Userdata to update yum package repository and install Nginx
 
-#### Configured Userdata to update yum package repository and installed nginx
 ```
 #!/bin/bash
 sudo su -
@@ -98,7 +111,72 @@ systemctl restart nginx
 rm -rf reverse.conf
 rm -rf /ACS-project-config
 ```
-### Configure Target Groups for Nginx, wordpress and tooling (webserver)
+### For Tooling Server
+#### - Setting up a launch template with the Bastion AMI
+#### - Ensuring the Instances are launched into the public subnet
+#### - Assigning appropriate security group
+#### - Entering the Userdata to update yum package repository and apache server
+```
+#!/bin/bash
+mkdir /var/www/
+sudo mount -t efs -o tls,accesspoint=fsap-053e953bddd2eff1b fs-08e7b5b3eba1146b4:/ /var/www/
+yum install -y httpd 
+systemctl start httpd
+systemctl enable httpd
+yum module reset php -y
+yum module enable php:remi-7.4 -y
+yum install -y php php-common php-mbstring php-opcache php-intl php-xml php-gd php-curl php-mysqlnd php-fpm php-json
+systemctl start php-fpm
+systemctl enable php-fpm
+git clone https://github.com/fola2022/tooling-1.git
+mkdir /var/www/html
+cp -R /tooling-1/html/*  /var/www/html/
+cd /tooling-1
+mysql -h acs-rds-database.cv3syqptmlls.us-east-1.rds.amazonaws.com -u ACSadmin -p toolingdb < tooling-db.sql
+cd /var/www/html/
+touch healthstatus
+sed -i "s/$db = mysqli_connect('mysql.tooling.svc.cluster.local', 'admin', 'admin', 'tooling');/$db = mysqli_connect('acs-rds-database.cv3syqptmlls.us-east-1.rds.amazonaws.com', 'ACSadmin', 'admin12345', 'toolingdb');/g" functions.php
+chcon -t httpd_sys_rw_content_t /var/www/html/ -R
+systemctl restart httpd
+```
+### For Wordpress server
+#### - Setting up a launch template with the Bastion AMI
+#### - Ensuring the Instances are launched into the public subnet
+#### - Assigning appropriate security group
+#### - Configure Userdata to update yum package repository and install wordpress and apache server
+```
+#!/bin/bash
+mkdir /var/www/
+sudo mount -t efs -o tls fs-08e7b5b3eba1146b4:/ /var/www/
+yum install -y httpd 
+systemctl start httpd
+systemctl enable httpd
+yum module reset php -y
+yum module enable php:remi-7.4 -y
+yum install -y php php-common php-mbstring php-opcache php-intl php-xml php-gd php-curl php-mysqlnd php-fpm php-json
+systemctl start php-fpm
+systemctl enable php-fpm
+wget http://wordpress.org/latest.tar.gz
+tar xzvf latest.tar.gz
+rm -rf latest.tar.gz
+cp wordpress/wp-config-sample.php wordpress/wp-config.php
+mkdir /var/www/html/
+cp -R /wordpress/* /var/www/html/
+cd /var/www/html/
+touch healthstatus
+sed -i "s/localhost/acs-rds-database.cv3syqptmlls.us-east-1.rds.amazonaws.com/g" wp-config.php 
+sed -i "s/username_here/ACSadmin/g" wp-config.php 
+sed -i "s/password_here/admin12345/g" wp-config.php 
+sed -i "s/database_name_here/wordpressdb/g" wp-config.php 
+chcon -t httpd_sys_rw_content_t /var/www/html/ -R
+systemctl restart httpd
+```
+<img width="693" alt="launch template" src="https://user-images.githubusercontent.com/112771723/202540903-41ddb852-f615-4303-b53a-b9f78a240caa.png">
+
+### Configure Target Groups for Nginx, wordpress and tooling 
+#### Selecting Instances as the target type
+#### Ensuring the protocol HTTPS on secure TLS port 443
+#### Ensuring that the health check path is /healthstatus
 <img width="691" alt="target group" src="https://user-images.githubusercontent.com/112771723/202542803-1c151eaa-d14a-474c-b47a-fad6cb40db80.png">
 
 
