@@ -174,6 +174,7 @@ ansible-galaxy collection install community.postgresql
 <img width="945" alt="ansible installed" src="https://user-images.githubusercontent.com/112771723/202183336-8fe64a51-6948-460e-9f39-b2248f1473db.png">
 <img width="692" alt="ansible version" src="https://user-images.githubusercontent.com/112771723/202183582-261de62a-7476-432e-80d3-38e2bcff2a06.png">
 <img width="947" alt="ansible collection" src="https://user-images.githubusercontent.com/112771723/202187481-70a6fc10-ebe2-4865-97f1-0049bd39b403.png">
+<img width="611" alt="postsq" src="https://user-images.githubusercontent.com/112771723/202469504-173fd418-e400-4854-b318-c97426083e33.png">
 
 #### After installing Ansible plugin in Jenkins UI, all the codes in Jenkinsfile was deleted to start from the scratch
 #### For ansible to be able to locate the roles in the playbook, the ansible.cfg filw was created in the deploy directory and then exported from the Jenkinsfile code which runs with tags 'webserver'.
@@ -183,6 +184,10 @@ ansible-galaxy collection install community.postgresql
 ![pipeline syntax 1](https://user-images.githubusercontent.com/112771723/202209114-96cb953a-254e-4e8c-ab6a-01d9d76a9863.png)
 ![pipeline systax ansible 2](https://user-images.githubusercontent.com/112771723/202209454-b1597067-18e0-42a2-8e15-7ad0a520671e.png)
 ![pipeline systax ansible 3](https://user-images.githubusercontent.com/112771723/202209781-051ad4fa-2165-4673-ab14-732d2572ea27.png)
+
+### Nginx and Mysql roles were collected from ansible galaxy and installed to the Jenkins-ansible server
+<img width="772" alt="nginx installeed" src="https://user-images.githubusercontent.com/112771723/202468868-493175c0-b393-4573-b625-26becbc4917f.png">
+<img width="745" alt="mysql roles installed" src="https://user-images.githubusercontent.com/112771723/202468813-dfa1c43d-4225-4eb6-a198-94164a6b31dd.png">
 
 #### Updating Jenkinsfile to introduce parameterization
 ```
@@ -218,6 +223,8 @@ pipeline {
   }
 }
 ```
+<img width="502" alt="excute unit successful" src="https://user-images.githubusercontent.com/112771723/202462050-75ffa7a3-445c-4cdc-81c4-4288a047907c.png">
+
 ### STEP 5: CI/CD PIPELINE FOR TODO APPLICATION
 #### The goal here is to deploy the application onto servers directly from Artifactory rather than from git.
 #### First, Artifactory role was collected from ansible galaxy and installed into the Jenkins-ansible server
@@ -263,8 +270,16 @@ http://<artifactory-server-ip>:8082/artifactory
 <img width="796" alt="artifactory on browser" src="https://user-images.githubusercontent.com/112771723/202221941-1bea7584-183e-4c95-9b68-79ecbfcd154b.png">
 
 ### Step 5.2: Integrate Artifactory repository with Jenkins
+#### Created a dummy Jenkinsfile in the root of the php-todo repo and in the Blue Ocean, I created a multibranch pipeline
+#### Created a database and user on the database server
+```
+Create database homestead;
+CREATE USER 'homestead'@'%' IDENTIFIED BY 'sePret^i';
+GRANT ALL PRIVILEGES ON * . * TO 'homestead'@'%';
+```
+#### Database connectivity requirements was updated in the file .env.sample
+<img width="182" alt="env  file " src="https://user-images.githubusercontent.com/112771723/202470274-157d62a9-5dc0-4064-adb1-473d3acdd17c.png">
 
-
-
+#### On database server, installing mysql: `sudo yum install mysql-server`
 
 
