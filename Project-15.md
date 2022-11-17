@@ -77,3 +77,45 @@ setsebool -P httpd_can_network_connect_db=1
 setsebool -P httpd_execmem=1
 setsebool -P httpd_use_nfs 1
 ```
+### STEP 3: Creating A Launch Template
+#### AMI is used to set up the launch template
+<img width="693" alt="launch template" src="https://user-images.githubusercontent.com/112771723/202540903-41ddb852-f615-4303-b53a-b9f78a240caa.png">
+
+#### Configured Userdata to update yum package repository and installed nginx
+```
+#!/bin/bash
+sudo su -
+yum install -y nginx
+systemctl start nginx
+systemctl enable nginx
+git clone https://github.com/fola2022/ACS-project-config.git
+mv /ACS-project-config/reverse.conf /etc/nginx/
+mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf-distro
+cd /etc/nginx/
+touch nginx.conf
+sed -n 'w nginx.conf' reverse.conf
+systemctl restart nginx
+rm -rf reverse.conf
+rm -rf /ACS-project-config
+```
+### Configure Target Groups for Nginx, wordpress and tooling (webserver)
+<img width="691" alt="target group" src="https://user-images.githubusercontent.com/112771723/202542803-1c151eaa-d14a-474c-b47a-fad6cb40db80.png">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
