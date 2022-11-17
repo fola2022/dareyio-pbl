@@ -6,8 +6,8 @@
 ### 5 EC2 Instances was used. They are;
 ##### Jenkins server (Redhat)
 ##### Database server (Ubuntu)
-##### Webserver (Nginx) 
-##### SonarQube
+##### Nginx (Redhat)
+##### SonarQube (Ubuntu)
 ##### Artifactory (Ubuntu)
 
 
@@ -428,7 +428,13 @@ stage('Code Analysis') {
 ```
 <img width="887" alt="Deploy to dev env" src="https://user-images.githubusercontent.com/112771723/202482807-8249aa0b-1400-4195-aef3-97ab52c41c3a.png">
 
-
+### SONARQUBE INSTALLATION
+#### Sonarqube installation was done by creating an ansible playbook role
+[Here is the link to the role in my repository](https://github.com/fola2022/Ansible-Config-mgt/tree/main/roles/sonarqube)
+<img width="518" alt="sonar install" src="https://user-images.githubusercontent.com/112771723/202494728-9aa2fac9-9e08-4280-95b5-380f445a398e.png">
+#### Access SonarQube on port 9000
+<img width="914" alt="sonarqube on broswer" src="https://user-images.githubusercontent.com/112771723/202494845-ace13659-41cf-444c-9045-fd35a184c28e.png">
+### CONFIGURING SONARQUBE AND JENKINS FOR QUALITY GATE
 
 
 
