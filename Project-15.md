@@ -218,12 +218,39 @@ systemctl restart httpd
 <img width="666" alt="file system created" src="https://user-images.githubusercontent.com/112771723/202560875-5076723a-9a7e-4c1b-892a-4fa1a57121ee.png">
 <img width="652" alt="efs access point" src="https://user-images.githubusercontent.com/112771723/202560933-b27083b5-0691-46d8-998a-25a64101ea1d.png">
 
+```
+git clone https://github.com/aws/efs-utils
+cd efs-utils
+yum install -y make
+yum install -y rpm-build
+make rpm 
+yum install -y  ./build/amazon-efs-utils*rpm
+```
 ### STEP 8: SETTING UP RDS
 #### A Key Management Service(KMS) was created in AWS, which was used to encrypt the database instance.
 <img width="705" alt="kms" src="https://user-images.githubusercontent.com/112771723/202562260-97f19692-769e-4263-bb8d-b61805c83511.png">
 
 #### Setting Up A Relational Database System
 <img width="704" alt="database" src="https://user-images.githubusercontent.com/112771723/202563095-73899713-e55d-42e3-87e8-7ddb6f544383.png">
+
+#### Setting up self-signed certificate for the nginx instance
+```
+sudo mkdir /etc/ssl/private
+sudo chmod 700 /etc/ssl/private
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ACS.key -out /etc/ssl/certs/ACS.crt
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+```
+#### Setting up self-signed certificate for the apache webserver instance
+```
+yum install -y mod_ssl
+openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/ACS.key -x509 -days 365 -out /etc/pki/tls/certs/ACS.crt
+vi /etc/httpd/conf.d/ssl.conf
+```
+<img width="737" alt="ssl cert in nginx" src="https://user-images.githubusercontent.com/112771723/202566954-77299f7f-0e2f-44f4-9e79-78ec74ed887e.png">
+<img width="607" alt="ssl" src="https://user-images.githubusercontent.com/112771723/202567200-7d8cabff-2eff-43a2-bfa4-a5ba1b8168a4.png">
+
+#### Login into the RDS instnace and created database for wordpress and database
+<img width="686" alt="bastion mysql" src="https://user-images.githubusercontent.com/112771723/202566811-f48fc7f4-8da0-4481-b696-1e323d0d517a.png">
 
 ####  DNS Records were created in The Route53 For the Tooling And Wordporess site
 #### The url https://www.tooling.yellowgem.tk was access on the broswer. The url route traffic from the application load balancer to the nginx and then to the internal ALB which forwards the traffic to the server for tooling site:
