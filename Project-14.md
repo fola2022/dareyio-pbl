@@ -497,5 +497,5 @@ sonar.php.tests.reportPath=build/logs/junit.xml
         }
     }
   ```
-  [Short video of the pipeline](
+  [Short video of the pipeline](https://folashade-pbl.s3.amazonaws.com/project+14+video.mp4)
     
