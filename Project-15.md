@@ -180,28 +180,22 @@ systemctl restart httpd
 <img width="691" alt="target group" src="https://user-images.githubusercontent.com/112771723/202542803-1c151eaa-d14a-474c-b47a-fad6cb40db80.png">
 
 ###  Configuring AutoScaling Group for Ngnix, Bastion, Tooling and Wordpress server
-#### - Selecting the right launch template
-#### - Selecting the VPC
-#### - Selecting both public subnets
-#### - Enabling Application Load Balancer for the AutoScalingGroup (ASG)
-#### - Selecting the target group created before
-#### - Ensuring health checks for both EC2 and ALB
+#### - Selecting the right launch template and selected the VPC
+#### - Selecting both public subnets and then enabled Application Load Balancer for the AutoScalingGroup (ASG) 
+#### - Selecting the target group created before, also ensuring health checks for both EC2 and ALB
 #### - Setting the desired capacity, Minimum capacity and Maximum capacity to 2
 #### - Setting the scale out option if CPU utilization reaches 90%
 #### - Activating SNS topic to send scaling notifications
 
 ### STEP 6: TLS Certificates From Amazon Certificate Manager (ACM)
 #### TLS certificates is created to handle secured connectivity to the Application Load Balancers (ALB)
-#### Using AWS ACM and Requested for a public certificate for the domain name registered on Freenom
-#### Using DNS to validate the domain name
+#### Using AWS ACM and Requested for a public certificate for the domain name registered on Freenom and also using DNS to validate the domain name
 ### Configuring Application Load Balancer (ALB)
 ### For External Load Balancer
-#### - Selecting Internet facing option
-#### - Ensuring that it listens on HTTPS protocol (TCP port 443)
+#### - Selecting Internet facing option and ensured that it listens on HTTPS protocol (TCP port 443)
 #### - Ensuring the ALB is created within the appropriate VPC, AZ and the right Subnets
 #### - Choosing the Certificate already created from ACM
-#### - Selecting Security Group for the external load balancer
-#### - Selecting Nginx Instances as the target group
+#### - Selecting Security Group for the external load balancer and selecting Nginx Instances as the target group
 ### For Internal Load Balancer
 #### - Selecting Internet facing option
 #### - Ensuring that it listens on HTTPS protocol (TCP port 443)
