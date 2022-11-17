@@ -273,6 +273,9 @@ http://<artifactory-server-ip>:8082/artifactory
 
 ### Step 5.2: Integrate Artifactory repository with Jenkins
 #### Created a dummy Jenkinsfile in the root of the php-todo repo and in the Blue Ocean, I created a multibranch pipeline
+#### MySql was installed in the php-todo directory
+<img width="947" alt="mysql install in php todo as client" src="https://user-images.githubusercontent.com/112771723/202490721-3055e1c3-4c17-4ed3-8f5e-2a23ff79c113.png">
+
 #### On database server, installing mysql:
 `sudo yum install mysql-server`
 <img width="597" alt="mysql running on db" src="https://user-images.githubusercontent.com/112771723/202486847-abe6f4d4-3829-4d27-86cc-dcef281e7933.png">
