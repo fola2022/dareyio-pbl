@@ -272,10 +272,7 @@ http://<artifactory-server-ip>:8082/artifactory
 
 
 ### Step 5.2: Integrate Artifactory repository with Jenkins
-#### Created a dummy Jenkinsfile in the root of the php-todo repo and in the Blue Ocean, I created a multibranch pipeline
-#### MySql was installed in the php-todo directory
-<img width="947" alt="mysql install in php todo as client" src="https://user-images.githubusercontent.com/112771723/202490721-3055e1c3-4c17-4ed3-8f5e-2a23ff79c113.png">
-
+#### Created a dummy Jenkinsfile in the root of the php-todo repo and in the Blue Ocean, I created a multibranch pipelin
 #### On database server, installing mysql:
 `sudo yum install mysql-server`
 <img width="597" alt="mysql running on db" src="https://user-images.githubusercontent.com/112771723/202486847-abe6f4d4-3829-4d27-86cc-dcef281e7933.png">
@@ -288,6 +285,11 @@ GRANT ALL PRIVILEGES ON * . * TO 'homestead'@'%';
 ```
 #### Configuring the bind_address in the my.cnf file:
 <img width="620" alt="bind address change on db server" src="https://user-images.githubusercontent.com/112771723/202473840-8911a7fc-07f1-431d-81fa-a7382084a8be.png">
+
+#### MySql was installed in the php-todo directory in the Jenkins-Anisble server as client
+<img width="947" alt="mysql install in php todo as client" src="https://user-images.githubusercontent.com/112771723/202490721-3055e1c3-4c17-4ed3-8f5e-2a23ff79c113.png">
+<img width="650" alt="mysql on jen-ansibe as client" src="https://user-images.githubusercontent.com/112771723/202491374-2deca259-66bc-412e-b711-0d05b85f29bc.png">
+
 #### Port 3306 was opened in the database security group
 
 #### Database connectivity requirements was updated in the file .env.sample
