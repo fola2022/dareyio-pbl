@@ -16,3 +16,16 @@ sudo yum -y install terraform
 terraform --help
 ``
 <img width="410" alt="verify terraform" src="https://user-images.githubusercontent.com/112771723/203073403-20cef8c0-fb95-4a66-9d8c-b0185a1e421d.png">
+
+#### Installing Tree
+```
+sudo yum install tree
+```
+<img width="607" alt="tree install" src="https://user-images.githubusercontent.com/112771723/203077599-e8e6e3b4-809d-4a3a-b34f-007dc7a4f5dc.png">
+
+#### Initializing Terraform
+```
+terraform init
+```
+<img width="504" alt="terraform init successful" src="https://user-images.githubusercontent.com/112771723/203077687-af240fb9-c8b8-4761-b559-972a72484f4b.png">
+<img width="185" alt="terraform init added file" src="https://user-images.githubusercontent.com/112771723/203077731-57f88b35-0f61-4f41-ab32-4f9dc1dca6de.png">
