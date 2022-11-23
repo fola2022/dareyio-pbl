@@ -39,7 +39,7 @@ resource "aws_vpc" "main" {
 }
 ```
 #### Then terraform plan and apply was run
-``
+```
 terraform plan
 ```
 ```
