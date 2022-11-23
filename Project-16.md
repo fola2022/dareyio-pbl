@@ -179,7 +179,7 @@ resource "aws_subnet" "public" {
 #### Setting values for each of the variables
 #### Below is the terraform.tfvars file 
 ```
-region = "eu-central-1"
+region = "us-east-1"
 
 vpc_cidr = "172.16.0.0/16" 
 
