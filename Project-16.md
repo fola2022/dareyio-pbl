@@ -226,7 +226,7 @@ variable "enable_classiclink_dns_support" {
 #### main.tf
 <img width="614" alt="main" src="https://user-images.githubusercontent.com/112771723/203605606-7bea1019-f693-4483-acd1-8268575a2eca.png">
 
-### The terraform applly created the VPC and subnet on AWS console
+### The terraform apply created the VPC and subnet on AWS console
 <img width="719" alt="vpc on aws console" src="https://user-images.githubusercontent.com/112771723/203605956-1038896d-a745-4df4-83cb-36f1cef0c67e.png">
 <img width="713" alt="public subnet " src="https://user-images.githubusercontent.com/112771723/203605975-1ba24184-ae53-4708-b4b0-42255d4006b0.png">
 
