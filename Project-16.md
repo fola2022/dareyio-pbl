@@ -196,7 +196,7 @@ preferred_number_of_public_subnets = 2
 #### Below is the variables.tf file
 ```
 variable "region" {
-      default = "eu-central-1"
+      default = "us-east-1"
 }
 
 variable "vpc_cidr" {
@@ -220,22 +220,8 @@ variable "enable_classiclink_dns_support" {
 }
 
   variable "preferred_number_of_public_subnets" {
-      default = null
+      default = 2
 }
-terraform.tfvars
-region = "eu-central-1"
-
-vpc_cidr = "172.16.0.0/16" 
-
-enable_dns_support = "true" 
-
-enable_dns_hostnames = "true"  
-
-enable_classiclink = "false" 
-
-enable_classiclink_dns_support = "false" 
-
-preferred_number_of_public_subnets = 2
 ```
 #### main.tf
 <img width="614" alt="main" src="https://user-images.githubusercontent.com/112771723/203605606-7bea1019-f693-4483-acd1-8268575a2eca.png">
