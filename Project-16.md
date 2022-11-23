@@ -1,6 +1,6 @@
 ## Automate Infrastructure With IAC using Terraform Part 1
 ### This project demonstrates how the AWS infrastructure for 2 websites that was built manually in project 15 is automated with the use of Terraform.
-### IAM user was created with AdministrativeAccess permissions in AWS and acquired the access key and secret access key. Then an S3 bucket named "fola-devv-terraform-bucket" was created in AWS to store Terraform state file
+### IAM user was created with AdministrativeAccess permissions in AWS and acquired the access key and secret key. Then an S3 bucket named "fola-devv-terraform-bucket" was created in AWS to store Terraform state file
 ### AWS CLI and Terraform were installed. The access key and security key was used to configure AWS CLI and the terraform was added to path on window
 #### Installed AWS CLI and S3 list
 ```
