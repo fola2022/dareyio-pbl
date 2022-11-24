@@ -11,6 +11,7 @@ resource "aws_subnet" "private" {
   availability_zone       = data.aws_availability_zones.available.names[count.index]
 ```
 <img width="473" alt="private subnet created" src="https://user-images.githubusercontent.com/112771723/203789764-de9c4bdc-bc27-4e7d-b96f-134a7c30bc3d.png">
+
 #### Creating tags attached to both the private and public subnets
 ```
 tags = merge(
