@@ -1057,6 +1057,31 @@ resource "aws_db_instance" "ACS-rds" {
   multi_az               = "true"
 }
 ```
+### VARIABLES
+```
+variable "account_no" {
+  type        = number
+  description = "AWS IAM account number"
+}
+
+variable "master-username" {
+  type        = string
+  description = "RDS admin username"
+}
+
+variable "master-password" {
+  type        = string
+  description = "RDS master password"
+}  
+```
+### TERRAFORM TFVARS
+```
+account_no = "154069555183"
+
+master-username = "fola12345"
+
+master-password = "fola12345"
+```                      
 
 
 
