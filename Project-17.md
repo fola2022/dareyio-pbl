@@ -913,18 +913,76 @@ yum install -y ansible
 ```
 #### For the Nginx server nginx.sh
 ```
-C
+#!/bin/bash
+yum install -y nginx
+systemctl start nginx
+systemctl enable nginx
+git clone https://github.com/Livingstone95/ACS-project-config.git
+mv /ACS-project-config/reverse.conf /etc/nginx/
+mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf-distro
+cd /etc/nginx/
+touch nginx.conf
+sed -n 'w nginx.conf' reverse.conf
+systemctl restart nginx
+rm -rf reverse.conf
+rm -rf /ACS-project-config
 ```
 #### For the Wordpress server wordpress.sh
 ```
-D
+#!/bin/bash
+mkdir /var/www/
+sudo mount -t efs -o tls,accesspoint=fsap-0f9364679383ffbc0 fs-8b501d3f:/ /var/www/
+yum install -y httpd 
+systemctl start httpd
+systemctl enable httpd
+yum module reset php -y
+yum module enable php:remi-7.4 -y
+yum install -y php php-common php-mbstring php-opcache php-intl php-xml php-gd php-curl php-mysqlnd php-fpm php-json
+systemctl start php-fpm
+systemctl enable php-fpm
+wget http://wordpress.org/latest.tar.gz
+tar xzvf latest.tar.gz
+rm -rf latest.tar.gz
+cp wordpress/wp-config-sample.php wordpress/wp-config.php
+mkdir /var/www/html/
+cp -R /wordpress/* /var/www/html/
+cd /var/www/html/
+touch healthstatus
+sed -i "s/localhost/acs-database.cdqpbjkethv0.us-east-1.rds.amazonaws.com/g" wp-config.php 
+sed -i "s/username_here/ACSadmin/g" wp-config.php 
+sed -i "s/password_here/admin12345/g" wp-config.php 
+sed -i "s/database_name_here/wordpressdb/g" wp-config.php 
+chcon -t httpd_sys_rw_content_t /var/www/html/ -R
+systemctl restart httpd
 ```
 #### For Tooling Webserver
 ```
-E
+#!/bin/bash
+mkdir /var/www/
+sudo mount -t efs -o tls,accesspoint=fsap-01c13a4019ca59dbe fs-8b501d3f:/ /var/www/
+yum install -y httpd 
+systemctl start httpd
+systemctl enable httpd
+yum module reset php -y
+yum module enable php:remi-7.4 -y
+yum install -y php php-common php-mbstring php-opcache php-intl php-xml php-gd php-curl php-mysqlnd php-fpm php-json
+systemctl start php-fpm
+systemctl enable php-fpm
+git clone https://github.com/Livingstone95/tooling-1.git
+mkdir /var/www/html
+cp -R /tooling-1/html/*  /var/www/html/
+cd /tooling-1
+mysql -h acs-database.cdqpbjkethv0.us-east-1.rds.amazonaws.com -u ACSadmin -p toolingdb < tooling-db.sql
+cd /var/www/html/
+touch healthstatus
+sed -i "s/$db = mysqli_connect('mysql.tooling.svc.cluster.local', 'admin', 'admin', 'tooling');/$db = mysqli_connect('acs-database.cdqpbjkethv0.us-east-1.rds.amazonaws.com ', 'ACSadmin', 'admin12345', 'toolingdb');/g" functions.php
+chcon -t httpd_sys_rw_content_t /var/www/html/ -R
+systemctl restart httpd
 ```
-### EFS
----
+### STEP 10: Creating Database And EFS Resources
+#### Creating a new file called efs.tf.
+#### Entering the following code to create KMS key to encrypt EFS resource:
+```
 # create key from key management system
 resource "aws_kms_key" "ACS-kms" {
   description = "KMS key "
@@ -956,7 +1014,7 @@ resource "aws_efs_file_system" "ACS-efs" {
   encrypted  = true
   kms_key_id = aws_kms_key.ACS-kms.arn
 
- tags = merge(
+  tags = merge(
     var.tags,
     {
       Name = "ACS-efs"
@@ -1025,7 +1083,7 @@ resource "aws_efs_access_point" "tooling" {
   }
 }
 ```
-### RDS
+#### Creating a new file called rds.tf and entering the following code which creates MySQL Relational Database System:
 ```
 # create DB subnet group from the private subnets
 resource "aws_db_subnet_group" "ACS-rds" {
@@ -1047,7 +1105,7 @@ resource "aws_db_instance" "ACS-rds" {
   engine                 = "mysql"
   engine_version         = "5.7"
   instance_class         = "db.t2.micro"
-  name                   = "foladb"
+  name                   = "db-rds"
   username               = var.master-username
   password               = var.master-password
   parameter_group_name   = "default.mysql5.7"
@@ -1057,31 +1115,14 @@ resource "aws_db_instance" "ACS-rds" {
   multi_az               = "true"
 }
 ```
-### VARIABLES
-```
-variable "account_no" {
-  type        = number
-  description = "AWS IAM account number"
-}
+### Executing Terraform plan
+<img width="577" alt="plan1" src="https://user-images.githubusercontent.com/112771723/203994057-eda1f361-9a77-4dcc-833a-840b73537870.png">
+<img width="557" alt="plan2" src="https://user-images.githubusercontent.com/112771723/203994077-cf776b8b-2e98-4ac0-aed5-ecb4c44cef03.png">
+<img width="437" alt="plan 3" src="https://user-images.githubusercontent.com/112771723/203994099-d23ea185-1a11-4d87-a5fb-1d077ac508e1.png">
 
-variable "master-username" {
-  type        = string
-  description = "RDS admin username"
-}
 
-variable "master-password" {
-  type        = string
-  description = "RDS master password"
-}  
-```
-### TERRAFORM TFVARS
-```
-account_no = "154069555183"
 
-master-username = "fola12345"
 
-master-password = "fola12345"
-```                      
 
 
 
