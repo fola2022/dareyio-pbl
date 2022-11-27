@@ -1,5 +1,5 @@
 ## AUTOMATE INFRASTRUCTURE WITH IAC USING TERRAFORM
-### In continuation of project 16, the remaining resources are created in this project in order to set up a secured infrastructure with Terraform
+### In continuation of [Project 16](https://github.com/fola2022/dareyio-pbl/blob/main/Project-16.md) the remaining resources are created in this project in order to set up a secured infrastructure with Terraform
 #### STEP 1: Creating Private Subnet
 ```
 # Create Private Subnet 
