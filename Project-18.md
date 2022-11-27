@@ -1,7 +1,7 @@
 ## AUTOMATING INFRASTRUCTURE WITH IAC USING TERRAFORM PART 3 – REFACTORING
 ### In continuation to [Project 17](https://github.com/fola2022/dareyio-pbl/blob/main/Project-17.md), the entire code is refactored in order to simplify the code using a Terraform tool called Module.
 ### The following outlines detailed step taken to achieve this:
-### STEP 1: Refactoring the code the root main.tf folder:
+### STEP 1: Refactoring the code in root main.tf folder:
 <img width="671" alt="root main" src="https://user-images.githubusercontent.com/112771723/204162970-c46d4bbf-aec2-4d71-a97d-13762087c043.png">
 <img width="668" alt="root main 2" src="https://user-images.githubusercontent.com/112771723/204162976-9cd57585-0c26-4490-a1da-aa894b935468.png">
 <img width="674" alt="root main 3" src="https://user-images.githubusercontent.com/112771723/204162984-1166d61f-ad5b-4560-9095-dbec17104511.png">
@@ -40,20 +40,6 @@ resource "aws_dynamodb_table" "terraform_locks" {
   }
 }
 ```
-
-#### - Creating a file called Backend.tf and entering the below code:
-```
-terraform {
-  backend "s3" {
-    bucket         = "fola-terraform18-bucket"
-    key            = "global/s3/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "terraform-locks"
-    encrypt        = true
-  }
-}
-```
-
 ### Refactoring The Codes Using Module
 #### Created a folder called modules
 #### The following folders were created inside the modules folder to combine resources of the similar type: ALB, VPC, Autoscaling, Security, EFS, RDS, Compute
