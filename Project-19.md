@@ -10,3 +10,19 @@
 
 #### Configuring the environment variable using my AWS credentials 
 <img width="911" alt="env" src="https://user-images.githubusercontent.com/112771723/205124959-ed6459a9-d310-4525-ac89-e233dd48573c.png">
+
+### STEP 2: Building AMI With Packer
+#### Installing packer on my local machine
+```
+sudo apt install packer
+```
+#### - Cloning the repository and changing directory to the AMI folder
+#### - Running the packer commands to build AMI for Bastion server, Nginx server and webserver
+```
+packer build bastion.pkr.hcl
+packer build nginx.pkr.hcl
+packer build web.pkr.hcl
+packer build ubuntu.pkr.hcl
+```
+![Screenshot (604)](https://user-images.githubusercontent.com/112771723/205126291-de4f6236-caa4-4bf4-b818-aa102fedf16c.png)
+
