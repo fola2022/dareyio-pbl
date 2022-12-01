@@ -58,4 +58,17 @@ packer build ubuntu.pkr.hcl
 #### For Wordpress
 <img width="650" alt="wordpress efs" src="https://user-images.githubusercontent.com/112771723/205139592-de980dc5-f327-4403-bb9b-e39057b7811b.png">
 
+#### Exporting the environment variable ANSIBLE_CONFIG to point to the ansible.cfg from the repo and running the ansible-playbook command
+#### Installing boto3
+```
+sudo python3.9 -m pip install boto3 botocore
+```
+![Screenshot (624)](https://user-images.githubusercontent.com/112771723/205140873-44bc877e-2947-4e4d-81fa-532b9a7a7774.png)
+
+#### Running ansible command
+```
+ansible-playbook -i inventory/aws_ec2.yml playbook/site.yml
+```
+<img width="751" alt="ans1" src="https://user-images.githubusercontent.com/112771723/205141244-5b7df024-f893-4f01-8c6b-adc2197566d6.png">
+
 
