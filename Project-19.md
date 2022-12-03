@@ -72,3 +72,10 @@ ansible-playbook -i inventory/aws_ec2.yml playbook/site.yml
 <img width="751" alt="ans1" src="https://user-images.githubusercontent.com/112771723/205141244-5b7df024-f893-4f01-8c6b-adc2197566d6.png">
 
 
+
+
+#### Website end point 
+```
+dev-test-fola20221203141952295600000001.s3-website-us-east-1.amazonaws.com
+```
+
