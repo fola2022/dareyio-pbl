@@ -98,14 +98,15 @@ ansible-playbook -i inventory/aws_ec2.yml playbook/site.yml
 #### Deploying the infrastructure by clicking on start new plan and apply
 <img width="674" alt="apply" src="https://user-images.githubusercontent.com/112771723/205489399-52504b45-8eff-4461-aa4c-4bbac5a9c4b8.png">
 
-#### Testing the Infrastructure
+#### Testing the Infrastructure by using the website end point
+```
+dev-test-fola20221203141952295600000001.s3-website-us-east-1.amazonaws.com
+```
 <img width="584" alt="end" src="https://user-images.githubusercontent.com/112771723/205489477-1daaf7f4-7337-470d-a0ad-faba14d92d47.png">
 
 #### Destroying the Infrastructure
 <img width="673" alt="destroy" src="https://user-images.githubusercontent.com/112771723/205489539-04ae427b-703d-4bf3-a77b-fd2e04086ad2.png">
 
-#### Website end point 
-```
-dev-test-fola20221203141952295600000001.s3-website-us-east-1.amazonaws.com
-```
+
+
 
