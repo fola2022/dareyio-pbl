@@ -71,8 +71,38 @@ ansible-playbook -i inventory/aws_ec2.yml playbook/site.yml
 ```
 <img width="751" alt="ans1" src="https://user-images.githubusercontent.com/112771723/205141244-5b7df024-f893-4f01-8c6b-adc2197566d6.png">
 
+### Working With Terraform Private Module Registry
+#### Forking the repo from hashicorp
+#### Then under my repository's tab, clicking on tag to create tag, clicking 'Create a new release' and adding 1.0.0 to the tag version field setting the release title to "First module release"
+<img width="889" alt="rel" src="https://user-images.githubusercontent.com/112771723/205488526-1070b850-11a7-4389-b7ed-489740b6e03f.png">
 
+#### To create a Terraform module for my private module registry in the terraform registry site, navigating to the Registry header in Terraform Cloud and selecting Publish private module from the upper right corner.
+#### Selecting the GitHub(Custom) VCS provider that I configured and choosing the name of the module repository terraform-aws-s3-webapp and clicking the Publish module button.
 
+#### To create a configuration that uses the module; forking the repo learn private module which will access the module published and Terraform will use it to create the infrastructure.
+#### main.tf
+<img width="530" alt="hb" src="https://user-images.githubusercontent.com/112771723/205488884-d8246f10-58c9-4ac0-ac72-0b421ed2e7ae.png">
+
+#### variable.tf
+<img width="681" alt="vb" src="https://user-images.githubusercontent.com/112771723/205488969-5f75676b-b2d6-43b0-90dc-67990b6494be.png">
+
+#### output.tf
+<img width="490" alt="out" src="https://user-images.githubusercontent.com/112771723/205488990-bf0575d9-1bd3-45cf-a179-1cfe35e041bd.png">
+
+#### - Creating a new workspace and selecting the learn-private-module-root repository
+<img width="670" alt="work" src="https://user-images.githubusercontent.com/112771723/205489089-d34e6da2-2822-48e2-85c7-ee4512a34fc2.png">
+
+#### - Clicking on Configure Variable to set my AWS credentials as environment variable and also set the values of these variables;region, prefix and name, which is specified in the root module configuration
+<img width="669" alt="variable" src="https://user-images.githubusercontent.com/112771723/205489148-113655d7-fc64-4ace-9ef3-aa743ab0a840.png">
+
+#### Deploying the infrastructure by clicking on start new plan and apply
+<img width="674" alt="apply" src="https://user-images.githubusercontent.com/112771723/205489399-52504b45-8eff-4461-aa4c-4bbac5a9c4b8.png">
+
+#### Testing the Infrastructure
+<img width="584" alt="end" src="https://user-images.githubusercontent.com/112771723/205489477-1daaf7f4-7337-470d-a0ad-faba14d92d47.png">
+
+#### Destroying the Infrastructure
+<img width="673" alt="destroy" src="https://user-images.githubusercontent.com/112771723/205489539-04ae427b-703d-4bf3-a77b-fd2e04086ad2.png">
 
 #### Website end point 
 ```
