@@ -1,6 +1,6 @@
 ## AUTOMATING INFRASTRUCTURE WITH IAC USING TERRAFORM PART 4 – TERRAFORM CLOUD
 ### INTRODUCTION
-#### In this project, instead of running the Terraform codes in project 18 from a command line, rather it is being executed from Terraform cloud console. The AMI is built differently with packer while Ansible is used to configure the infrastructure after its been provisioned by Terraform. 
+#### In this project, instead of running the Terraform codes in [project 18](https://github.com/fola2022/dareyio-pbl/blob/main/Project-18.md) from a command line, rather it is being executed from Terraform cloud console. The AMI is built differently with packer while Ansible is used to configure the infrastructure after its been provisioned by Terraform. 
 ### STEP 1: Setting Up A Terraform Account
 #### After creating and account on the terraform console, an organisation was created in the terraform cloud site
 #### To configure the workspace, version control workflow was selected in order to run terraform commands triggered from git repository
