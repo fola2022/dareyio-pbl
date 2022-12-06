@@ -7,13 +7,16 @@ All the problem highlighted above is solved by containerization. Container solve
 
 containers are used to package application code, app configuration, dependencies and runtime environment required for running an application. This garanties to a large extent that the application runs efficiently and predictably on any environment it is deployed provider it has a container runtime.
 ### MySQL in container
-step 1: Pull MySQL Docker Image from Docker Hub Registry
-
+### Step 1: Pulling MySQL Docker Image from Docker Hub Registry
+```
 docker pull mysql/mysql-server:latest
+```
+<img width="505" alt="mysql image" src="https://user-images.githubusercontent.com/112771723/205931366-5178b240-dc18-4bee-abca-36d0de6bd278.png">
 
-List the images to check that you have downloaded them successfully:
-
+#### Listing the images to check that it downloaded successfully:
+```
 docker image ls
+```
 
 Step 2: Deploy the MySQL Container to your Docker Engine
 
