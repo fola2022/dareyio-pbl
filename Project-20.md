@@ -17,7 +17,7 @@ docker image ls
 ```
 <img width="505" alt="mysql image" src="https://user-images.githubusercontent.com/112771723/205931366-5178b240-dc18-4bee-abca-36d0de6bd278.png">
 
-#### Step 2: Deploying MySQL Container to my Docker Engine
+### Step 2: Deploying MySQL Container to my Docker Engine
 ```
 docker run --name <container_name> -e MYSQL_ROOT_PASSWORD=<my-secret-pw> -d mysql/mysql-server:latest
 ```
@@ -27,11 +27,13 @@ docker ps -a
 ```
 <img width="938" alt="mysql running" src="https://user-images.githubusercontent.com/112771723/205934314-5a8178bc-8a74-4a22-bfd0-c36f14403881.png">
 
-### CONNECTING TO THE MYSQL DOCKER CONTAINER
+### Step 3: CONNECTING TO THE MYSQL DOCKER CONTAINER
 #### First, create a network:
 ```
 docker network create --subnet=172.18.0.0/24 tooling_app_network
 ```
+<img width="421" alt="docker network created" src="https://user-images.githubusercontent.com/112771723/205942491-7d5f0ef6-69ad-41b9-acad-729605c7ad4a.png">
+
 #### Create an environment variable to store the root password:
 ```
 export MYSQL_PW=
@@ -49,54 +51,54 @@ CREATE USER 'shade'@'%' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON *.* TO 'shade'@'%';
 FLUSH PRIVILEGES;
 ```
+<img width="353" alt="sss" src="https://user-images.githubusercontent.com/112771723/205941311-8e5a1e5e-e531-490a-8e80-550e44244bbe.png">
+
 #### Running the script to create the new user: 
 ```
 docker exec -i mysql-server mysql -uroot -p$MYSQL_PW < create_user.sql
 ```
+<img width="518" alt="user create" src="https://user-images.githubusercontent.com/112771723/205941573-45fa768f-2ad4-4823-a927-f3d269519f69.png">
 
 #### Connecting to the MySQL server from a second container running the MySQL client utility
-Run the MySQL Client Container:
-
+```
 docker run --network tooling_app_network --name mysql-client -it --rm mysql mysql -h mysqlserverhost -u -p
+```
+<img width="541" alt="mysql d" src="https://user-images.githubusercontent.com/112771723/205942348-16b9ea2d-4436-4c3b-ba98-7a0f5366b859.png">
 
-Prepare database schema
-Clone the Tooling-app repository from [here](clone https://github.com/darey-devops/tooling.git)
-
+### Step 4: Preparing database schema
+#### Tooling-app repository from [here](clone https://github.com/darey-devops/tooling.git) was cloned
+```
 git clone https://github.com/darey-devops/tooling.git
-
-On your terminal, export the location of the SQL file
-
-export tooling_db_schema=tooling/html/tooling_db_schema.sql
-
-Verify that the path is exported:
-
-echo $tooling_db_schema
-
-Use the SQL script to create the database and prepare the schema. With the docker exec command, you can execute a command in a running container:
-
+```
+#### Exporting the location of the SQL file `export tooling_db_schema=tooling/html/tooling_db_schema.sql`
+#### Verify that the path is exported: `echo $tooling_db_schema`
+#### Using the SQL script to create the database and prepare the schema by using the docker exec command 
+```
 docker exec -i mysql-server mysql -uroot -p$MYSQL_PW < $tooling_db_schema
+```
+#### Updating the .env file with connection details to the database:
+```
+sudo vi .env
+MYSQL_IP=mysqlserverhost
+MYSQL_USER=username
+MYSQL_PASS=client-secrete-password
+MYSQL_DBNAME=toolingdb
+```
+<img width="253" alt="vi" src="https://user-images.githubusercontent.com/112771723/205943663-3b1e7276-16ff-40f0-a471-a9994ea23755.png">
 
-Update the .env file with connection details to the database:
-
-             ```
-                  sudo vi .env
-
-               MYSQL_IP=mysqlserverhost
-               MYSQL_USER=username
-               MYSQL_PASS=client-secrete-password
-               MYSQL_DBNAME=toolingdb
-
-            ```
-Run the Tooling App
-
+### Step 5: Running The Tooling App
 Build the image using the Dockerfile in the clonned Repo
-
+```
 docker build -t tooling:0.0.1 .
+```
+<img width="940" alt="run" src="https://user-images.githubusercontent.com/112771723/205945551-f2618ffd-4b9c-46c4-ab8c-28e4252f5a90.png">
 
-Run the app with the command below:
+#### Running the app
+```
+docker run --network tooling_app_network -p 8085:80 -it folah/tooling:0.0.1
+```
+#### Testing the tooling app in the browser:http://localhost:8085
+<img width="772" alt="end" src="https://user-images.githubusercontent.com/112771723/205946120-131c0b67-24fe-49d6-9715-4c0cbcefa95d.png">
+![Screenshot (652)](https://user-images.githubusercontent.com/112771723/205946206-15442158-03f9-4719-b28e-23806d1a2c29.png)
 
-docker run --network tooling_app_network -p 8085:80 -it tooling:0.0.1
-
-You should find something like the screenshot below on your browser:
-
-
+### PRACTICAL TASK
