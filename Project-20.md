@@ -99,7 +99,8 @@ docker run --network tooling_app_network -p 8085:80 -it folah/tooling:0.0.1
 ```
 #### Testing the tooling app in the browser:http://localhost:8085
 <img width="772" alt="end" src="https://user-images.githubusercontent.com/112771723/205946120-131c0b67-24fe-49d6-9715-4c0cbcefa95d.png">
-![Screenshot (652)](https://user-images.githubusercontent.com/112771723/205947086-ab1bc0fd-01da-419d-bdf0-a2f3c25d3d05.png)
+<img width="725" alt="end2" src="https://user-images.githubusercontent.com/112771723/205947671-5c5cc052-3a26-43a6-8ff0-3b91ed77bc0b.png">
+
 
 
 ### PRACTICAL TASK
