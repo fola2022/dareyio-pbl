@@ -58,6 +58,8 @@ aws ec2 create-tags \
   --resources ${VPC_ID} \
   --tags Key=Name,Value=${NAME}
 ```
+<img width="508" alt="vpc and name tag" src="https://user-images.githubusercontent.com/112771723/207021776-140e545b-9728-465a-a920-59958db07615.png">
+
 #### Enabling DNS support for VPC
 ```
 aws ec2 modify-vpc-attribute \
@@ -74,3 +76,28 @@ aws ec2 modify-vpc-attribute \
 ```
 AWS_REGION=eu-central-1
 ```
+<img width="497" alt="vpc region" src="https://user-images.githubusercontent.com/112771723/207021848-bd6aab86-f743-419f-b730-c3027f2812a0.png">
+<img width="710" alt="vpc" src="https://user-images.githubusercontent.com/112771723/207022149-088c27ce-78bc-41c7-8bbe-27ea63fc3387.png">
+
+#### Configuring DHCP Options Set
+```
+DHCP_OPTION_SET_ID=$(aws ec2 create-dhcp-options \
+  --dhcp-configuration \
+    "Key=domain-name,Values=$AWS_REGION.compute.internal" \
+    "Key=domain-name-servers,Values=AmazonProvidedDNS" \
+  --output text --query 'DhcpOptions.DhcpOptionsId')
+```
+#### Tagging the DHCP Option set
+```
+aws ec2 create-tags \
+  --resources ${DHCP_OPTION_SET_ID} \
+  --tags Key=Name,Value=${NAME}
+```
+#### Associating DHCP Option set with VPC
+```
+aws ec2 associate-dhcp-options \
+  --dhcp-options-id ${DHCP_OPTION_SET_ID} \
+  --vpc-id ${VPC_ID}
+```
+<img width="710" alt="dhcp vpc" src="https://user-images.githubusercontent.com/112771723/207024760-5d423116-9ded-41e3-ab0d-429fef36eb54.png">
+
