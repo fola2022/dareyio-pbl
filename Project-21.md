@@ -37,4 +37,5 @@ chmod +x cfssl cfssljson
 ```
 sudo mv cfssl cfssljson /usr/local/bin/
 ```
+<img width="946" alt="kubectl install" src="https://user-images.githubusercontent.com/112771723/206996127-87c4e16f-8d05-463c-b24f-0e73d9c5dcbb.png">
 
