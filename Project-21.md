@@ -236,5 +236,51 @@ KUBERNETES_PUBLIC_ADDRESS=$(aws elbv2 describe-load-balancers \
 ```
 <img width="731" alt="target  group" src="https://user-images.githubusercontent.com/112771723/207047289-61d26ed7-73e5-4a21-92d8-027421790ec9.png">
 
+### STEP 2 – CREATE COMPUTE RESOURCES
+#### Creating AMI
+```
+IMAGE_ID=$(aws ec2 describe-images --owners 099720109477 \
+  --filters \
+  'Name=root-device-type,Values=ebs' \
+  'Name=architecture,Values=x86_64' \
+  'Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*' \
+  | jq -r '.Images|sort_by(.Name)[-1]|.ImageId')
+```
+<img width="668" alt="image and ssh" src="https://user-images.githubusercontent.com/112771723/207057738-290ec506-cd74-4b05-a136-fb4b933dbfff.png">
+
+#### Creating ssh key
+```
+mkdir -p ssh
+
+aws ec2 create-key-pair \
+  --key-name ${NAME} \
+  --output text --query 'KeyMaterial' \
+  > ssh/${NAME}.id_rsa
+chmod 600 ssh/${NAME}.id_rsa
+```
+<img width="917" alt="ssh" src="https://user-images.githubusercontent.com/112771723/207057818-2e2efb5b-7684-41f6-8800-bb2746b166dd.png">
+
+#### EC2 Instances for Controle Plane (Master Nodes)
+```
+for i in 0 1 2; do
+  instance_id=$(aws ec2 run-instances \
+    --associate-public-ip-address \
+    --image-id ${IMAGE_ID} \
+    --count 1 \
+    --key-name ${NAME} \
+    --security-group-ids ${SECURITY_GROUP_ID} \
+    --instance-type t2.micro \
+    --private-ip-address 172.31.0.1${i} \
+    --user-data "name=master-${i}" \
+    --subnet-id ${SUBNET_ID} \
+    --output text --query 'Instances[].InstanceId')
+  aws ec2 modify-instance-attribute \
+    --instance-id ${instance_id} \
+    --no-source-dest-check
+  aws ec2 create-tags \
+    --resources ${instance_id} \
+    --tags "Key=Name,Value=${NAME}-master-${i}"
+done
+```
 
  
