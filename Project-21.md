@@ -74,7 +74,7 @@ aws ec2 modify-vpc-attribute \
 ```
 #### Setting the required region
 ```
-AWS_REGION=eu-central-1
+AWS_REGION=us-east-1
 ```
 <img width="497" alt="vpc region" src="https://user-images.githubusercontent.com/112771723/207021848-bd6aab86-f743-419f-b730-c3027f2812a0.png">
 <img width="710" alt="vpc" src="https://user-images.githubusercontent.com/112771723/207022149-088c27ce-78bc-41c7-8bbe-27ea63fc3387.png">
