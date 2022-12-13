@@ -261,6 +261,7 @@ chmod 600 ssh/${NAME}.id_rsa
 <img width="917" alt="ssh" src="https://user-images.githubusercontent.com/112771723/207057818-2e2efb5b-7684-41f6-8800-bb2746b166dd.png">
 
 #### EC2 Instances for Controle Plane (Master Nodes)
+#### Creating 3 master nodes
 ```
 for i in 0 1 2; do
   instance_id=$(aws ec2 run-instances \
@@ -282,5 +283,338 @@ for i in 0 1 2; do
     --tags "Key=Name,Value=${NAME}-master-${i}"
 done
 ```
+#### Creating 3 worker nodes
+```
+for i in 0 1 2; do
+  instance_id=$(aws ec2 run-instances \
+    --associate-public-ip-address \
+    --image-id ${IMAGE_ID} \
+    --count 1 \
+    --key-name ${NAME} \
+    --security-group-ids ${SECURITY_GROUP_ID} \
+    --instance-type t2.micro \
+    --private-ip-address 172.31.0.2${i} \
+    --user-data "name=worker-${i}|pod-cidr=172.20.${i}.0/24" \
+    --subnet-id ${SUBNET_ID} \
+    --output text --query 'Instances[].InstanceId')
+  aws ec2 modify-instance-attribute \
+    --instance-id ${instance_id} \
+    --no-source-dest-check
+  aws ec2 create-tags \
+    --resources ${instance_id} \
+    --tags "Key=Name,Value=${NAME}-worker-${i}"
+done
+```
+<img width="556" alt="ec2 worker" src="https://user-images.githubusercontent.com/112771723/207312256-6b7b53ec-6051-402a-8f2f-f63cfcbf7545.png">
+<img width="724" alt="ec2" src="https://user-images.githubusercontent.com/112771723/207312496-c4a25d59-ba92-4fd8-8850-ab9183b93b88.png">
+
+### STEP 3: Preparing The Self-Signed Certificate Authority And Generating The TLS Certificates
+#### The PKI Infrastructure is provisioned using cfssl which will have a Certificate Authority, that will generate certificates for all the individual components
+#### Creating a directory called ca-authority and cd into it
+```
+mkdir ca-authority && cd ca-authority
+```
+#### Generating the CA configuration file, Root Certificate, and Private key
+```
+{
+
+cat > ca-config.json <<EOF
+{
+  "signing": {
+    "default": {
+      "expiry": "8760h"
+    },
+    "profiles": {
+      "kubernetes": {
+        "usages": ["signing", "key encipherment", "server auth", "client auth"],
+        "expiry": "8760h"
+      }
+    }
+  }
+}
+EOF
+
+cat > ca-csr.json <<EOF
+{
+  "CN": "Kubernetes",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "Kubernetes",
+      "OU": "DAREY.IO DEVOPS",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+
+}
+```
+<img width="760" alt="cert" src="https://user-images.githubusercontent.com/112771723/207313560-114988dd-224b-42df-b769-eca8941335b8.png">
+
+#### Provisioning Client/Server certificates for all the components that will communicate with the api-server by using the root CA to request more certificates which the different Kubernetes components, i.e. clients and server, will use to have encrypted communication.
+<img width="939" alt="cfssl" src="https://user-images.githubusercontent.com/112771723/207314077-b9f6a4a5-c0e5-49d3-94cd-dd09df2fc5cc.png">
+
+#### Generating the Certificate Signing Request (CSR), Private Key and the Certificate for the Kubernetes Master Nodes (api-server)
+```
+{
+cat > master-kubernetes-csr.json <<EOF
+{
+  "CN": "kubernetes",
+   "hosts": [
+   "127.0.0.1",
+   "172.31.0.10",
+   "172.31.0.11",
+   "172.31.0.12",
+   "ip-172-31-0-10",
+   "ip-172-31-0-11",
+   "ip-172-31-0-12",
+   "ip-172-31-0-10.${AWS_REGION}.compute.internal",
+   "ip-172-31-0-11.${AWS_REGION}.compute.internal",
+   "ip-172-31-0-12.${AWS_REGION}.compute.internal",
+   "${KUBERNETES_PUBLIC_ADDRESS}",
+   "kubernetes",
+   "kubernetes.default",
+   "kubernetes.default.svc",
+   "kubernetes.default.svc.cluster",
+   "kubernetes.default.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "Kubernetes",
+      "OU": "DAREY.IO DEVOPS",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  master-kubernetes-csr.json | cfssljson -bare master-kubernetes
+}
+```
+<img width="718" alt="cert 3" src="https://user-images.githubusercontent.com/112771723/207314503-70cb0708-0d39-46b1-86f4-3d8739faaed3.png">
+
+#### Generating Client Certificate and Private Key for kube-scheduler
+```
+{
+
+cat > kube-scheduler-csr.json <<EOF
+{
+  "CN": "system:kube-scheduler",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "system:kube-scheduler",
+      "OU": "DAREY.IO DEVOPS",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+
+}
+```
+<img width="781" alt="cert kube schduler" src="https://user-images.githubusercontent.com/112771723/207314804-69a7f13c-695d-4da0-992e-3019bef416f3.png">
+
+#### Generating Client Certificate and Private Key for kube-proxy
+```
+{
+
+cat > kube-proxy-csr.json <<EOF
+{
+  "CN": "system:kube-proxy",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "system:node-proxier",
+      "OU": "DAREY.IO DEVOPS",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  kube-proxy-csr.json | cfssljson -bare kube-proxy
+
+}
+```
+#### Generating Client Certificate and Private Key for kube-controller-manager
+```
+{
+cat > kube-controller-manager-csr.json <<EOF
+{
+  "CN": "system:kube-controller-manager",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "system:kube-controller-manager",
+      "OU": "DAREY.IO DEVOPS",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+
+}
+```
+#### Generating Client Certificate and Private Key for kubelet
+```
+for i in 0 1 2; do
+  instance="${NAME}-worker-${i}"
+  instance_hostname="ip-172-31-0-2${i}"
+  cat > ${instance}-csr.json <<EOF
+{
+  "CN": "system:node:${instance_hostname}",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "system:nodes",
+      "OU": "DAREY.IO DEVOPS",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+
+  internal_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PrivateIpAddress')
+
+  cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -hostname=${instance_hostname},${external_ip},${internal_ip} \
+    -profile=kubernetes \
+    ${NAME}-worker-${i}-csr.json | cfssljson -bare ${NAME}-worker-${i}
+done
+```
+#### Generating Client Certificate and Private Key for kubernetes admin user
+```
+{
+cat > admin-csr.json <<EOF
+{
+  "CN": "admin",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "system:masters",
+      "OU": "DAREY.IO DEVOPS",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  admin-csr.json | cfssljson -bare admin
+}
+```
+#### Generating Client Certificate and Private Key for Token Controller
+#### It is a part of the Kubernetes Controller Manager responsible for generating and signing service account tokens which are used by pods or other resources to establish connectivity to the api-server
+```
+{
+
+cat > service-account-csr.json <<EOF
+{
+  "CN": "service-accounts",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "England",
+      "O": "Kubernetes",
+      "OU": "DAREY.IO DEVOPS",
+      "ST": "London"
+    }
+  ]
+}
+EOF
+
+cfssl gencert \
+  -ca=ca.pem \
+  -ca-key=ca-key.pem \
+  -config=ca-config.json \
+  -profile=kubernetes \
+  service-account-csr.json | cfssljson -bare service-account
+}
+```
+
+
+
+
 
  
