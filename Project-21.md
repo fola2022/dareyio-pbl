@@ -612,9 +612,180 @@ cfssl gencert \
   service-account-csr.json | cfssljson -bare service-account
 }
 ```
+### STEP 4: Distributing The Client And Server Certificates
+#### Sending all the client and server certificates to their respective instances. Starting from worker nodes
+```
+for i in 0 1 2; do
+  instance="${NAME}-worker-${i}"
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    ca.pem ${instance}-key.pem ${instance}.pem ubuntu@${external_ip}:~/; \
+done
+```
+<img width="939" alt="worker node cert distr" src="https://user-images.githubusercontent.com/112771723/207316889-a223b6f5-d0ad-4b6b-91e3-3a50109838d2.png">
 
+#### For master nodes
+```
+for i in 0 1 2; do
+instance="${NAME}-master-${i}" \
+  external_ip=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=${instance}" \
+    --output text --query 'Reservations[].Instances[].PublicIpAddress')
+  scp -i ../ssh/${NAME}.id_rsa \
+    ca.pem ca-key.pem service-account-key.pem service-account.pem \
+    master-kubernetes.pem master-kubernetes-key.pem ubuntu@${external_ip}:~/;
+done
+```
+<img width="945" alt="master node cert distr" src="https://user-images.githubusercontent.com/112771723/207317090-2eaf7afd-e11d-47ce-bd32-eb1c69f1dd69.png">
 
+### STEP 5: Using KUBECTL To Generate Kubernates Configuration Files For Authentication
+#### Creating an environment variables for reuse by multiple commands
+```
+KUBERNETES_API_SERVER_ADDRESS=$(aws elbv2 describe-load-balancers --load-balancer-arns ${LOAD_BALANCER_ARN} --output text --query 'LoadBalancers[].DNSName')
+```
+#### Generating the kubelet kubeconfig file
+```
+for i in 0 1 2; do
 
+instance="${NAME}-worker-${i}"
+instance_hostname="ip-172-31-0-2${i}"
+
+ # Set the kubernetes cluster in the kubeconfig file
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://$KUBERNETES_API_SERVER_ADDRESS:6443 \
+    --kubeconfig=${instance}.kubeconfig
+
+# Set the cluster credentials in the kubeconfig file
+  kubectl config set-credentials system:node:${instance_hostname} \
+    --client-certificate=${instance}.pem \
+    --client-key=${instance}-key.pem \
+    --embed-certs=true \
+    --kubeconfig=${instance}.kubeconfig
+
+# Set the context in the kubeconfig file
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:node:${instance_hostname} \
+    --kubeconfig=${instance}.kubeconfig
+
+  kubectl config use-context default --kubeconfig=${instance}.kubeconfig
+done
+```
+<img width="947" alt="kube config" src="https://user-images.githubusercontent.com/112771723/207319704-fff3004d-cc99-4e5e-b53e-1a27518226b0.png">
+
+```
+ls -ltr *.kubeconfig
+```
+<img width="934" alt="kube config ls" src="https://user-images.githubusercontent.com/112771723/207318301-ef4f278e-8311-4b53-a290-d6c95145a469.png">
+
+#### Generating the kube-proxy kubeconfig
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://${KUBERNETES_API_SERVER_ADDRESS}:6443 \
+    --kubeconfig=kube-proxy.kubeconfig
+
+  kubectl config set-credentials system:kube-proxy \
+    --client-certificate=kube-proxy.pem \
+    --client-key=kube-proxy-key.pem \
+    --embed-certs=true \
+    --kubeconfig=kube-proxy.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:kube-proxy \
+    --kubeconfig=kube-proxy.kubeconfig
+
+  kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+}
+```
+<img width="440" alt="kube proxy" src="https://user-images.githubusercontent.com/112771723/207319565-0c4ed989-66f5-4189-b46f-c4b82dd283ca.png">
+
+#### Generating the Kube-Controller-Manager kubeconfig
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig=kube-controller-manager.kubeconfig
+
+  kubectl config set-credentials system:kube-controller-manager \
+    --client-certificate=kube-controller-manager.pem \
+    --client-key=kube-controller-manager-key.pem \
+    --embed-certs=true \
+    --kubeconfig=kube-controller-manager.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:kube-controller-manager \
+    --kubeconfig=kube-controller-manager.kubeconfig
+
+  kubectl config use-context default --kubeconfig=kube-controller-manager.kubeconfig
+}
+```
+<img width="557" alt="kube controller" src="https://user-images.githubusercontent.com/112771723/207319473-31a83be0-c75c-444b-a247-b3f708805081.png">
+
+#### Generating the Kube-Scheduler Kubeconfig
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig=kube-scheduler.kubeconfig
+
+  kubectl config set-credentials system:kube-scheduler \
+    --client-certificate=kube-scheduler.pem \
+    --client-key=kube-scheduler-key.pem \
+    --embed-certs=true \
+    --kubeconfig=kube-scheduler.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=system:kube-scheduler \
+    --kubeconfig=kube-scheduler.kubeconfig
+
+  kubectl config use-context default --kubeconfig=kube-scheduler.kubeconfig
+}
+```
+#### Generating the kubeconfig file for the admin user
+```
+{
+  kubectl config set-cluster ${NAME} \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://${KUBERNETES_API_SERVER_ADDRESS}:6443 \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config set-credentials admin \
+    --client-certificate=admin.pem \
+    --client-key=admin-key.pem \
+    --embed-certs=true \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=${NAME} \
+    --user=admin \
+    --kubeconfig=admin.kubeconfig
+
+  kubectl config use-context default --kubeconfig=admin.kubeconfig
+}
+```
+<img width="472" alt="kube admin user" src="https://user-images.githubusercontent.com/112771723/207320260-bab40097-f69f-4aad-bb28-7f9d6b9a7bd0.png">
+
+#### Distributing the files to thier respective servers using scp and for loop
+#### For Master nodes
+<img width="945" alt="master scp config" src="https://user-images.githubusercontent.com/112771723/207320681-8f0353e9-0531-4c66-82ab-dea27f7d9fb3.png">
+
+#### For Worker nodes
+<img width="532" alt="worker scp config" src="https://user-images.githubusercontent.com/112771723/207321188-b376a6a9-c5d7-4a11-9c84-c9762d5d397e.png">
 
 
  
