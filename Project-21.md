@@ -812,6 +812,12 @@ EOF
  <img width="935" alt="encryption yaml" src="https://user-images.githubusercontent.com/112771723/207322256-dd8c00f5-d4c8-40fd-aff7-124209ccb85f.png">
 
 ### Step 7: Bootstrapping etcd cluster using tmux to work with multiple terminal sessions simultaneously. Opening 3 panes and ssh into the 3 master nodes and setting the synchronize-panes on
+#### Installing tmux
+```
+sudo apt install tmux
+```
+<img width="483" alt="tmux" src="https://user-images.githubusercontent.com/112771723/207846736-d5312a43-6460-45a2-bab7-06891d522b5d.png">
+
 #### For master node 1
 ```
 master_1_ip=$(aws ec2 describe-instances \
@@ -834,7 +840,7 @@ master_3_ip=$(aws ec2 describe-instances \
 --output text --query 'Reservations[].Instances[].PublicIpAddress')
 ssh -i k8s-cluster-from-ground-up.id_rsa ubuntu@${master_3_ip}
 ```
-
+![Screenshot (737)](https://user-images.githubusercontent.com/112771723/207845511-5c1be989-db8c-41a6-95aa-a60b45ad99ee.png)
 
 #### Downloading and installing etcd
 ```
@@ -856,11 +862,12 @@ sudo mv etcd-v3.4.15-linux-amd64/etcd* /usr/local/bin/
   sudo cp ca.pem master-kubernetes-key.pem master-kubernetes.pem /etc/etcd/
 }
 ```
-
 #### The instance internal IP address will be used to serve client requests and communicate with etcd cluster peers. Retrieving the internal IP address for the current compute instance
 ```
 export INTERNAL_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 ```
+<img width="938" alt="bootstrap m1" src="https://user-images.githubusercontent.com/112771723/207848889-111a2f57-ff4d-4b65-b3c4-ddfda0928107.png">
+
 #### Each etcd member must have a unique name within an etcd cluster. Set the etcd name to node Private IP address so it will uniquely identify the machine
 ```
 ETCD_NAME=$(curl -s http://169.254.169.254/latest/user-data/ \
@@ -922,3 +929,195 @@ sudo ETCDCTL_API=3 etcdctl member list \
 ```
 systemctl status etcd
 ```  
+<img width="958" alt="master node 1 running" src="https://user-images.githubusercontent.com/112771723/207850990-c54e62bd-15c6-4927-b6c1-2f4829529826.png">
+<img width="956" alt="master node 2 running" src="https://user-images.githubusercontent.com/112771723/207851039-24ecd8b4-f1be-41fb-b91d-c014426e6908.png">
+<img width="944" alt="master node 3 running" src="https://user-images.githubusercontent.com/112771723/207851087-4132db9d-9d7d-4b7b-bb97-176badfc2c70.png">
+
+#### STEP 7: Configuring The Components For The Control Plane On The Master/Controller Nodes
+#### BOOTSTRAP THE CONTROL PLANE
+#### Creating the Kubernetes configuration directory
+```
+sudo mkdir -p /etc/kubernetes/config
+```
+#### Downloading the official Kubernetes release binaries
+```
+wget -q --show-progress --https-only --timestamping \
+"https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kube-apiserver" \
+"https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kube-controller-manager" \
+"https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kube-scheduler" \
+"https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubectl"
+```
+#### Installing the Kubernetes binaries
+```
+{
+chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
+sudo mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
+}
+```
+#### Configuring the Kubernetes API Server
+```
+{
+sudo mkdir -p /var/lib/kubernetes/
+
+sudo mv ca.pem ca-key.pem master-kubernetes-key.pem master-kubernetes.pem \
+service-account-key.pem service-account.pem \
+encryption-config.yaml /var/lib/kubernetes/
+}
+```
+#### The instance internal IP address will be used to advertise the API Server to members of the cluster. Retrieving the internal IP address for the current compute instance:
+```
+export INTERNAL_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+```
+![Screenshot (748)](https://user-images.githubusercontent.com/112771723/207853073-0ba1b3b8-43e5-4d22-8ea2-bab7ae58a4ad.png)
+
+#### Creating the kube-apiserver.service systemd unit file
+```
+cat <<EOF | sudo tee /etc/systemd/system/kube-apiserver.service
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+ExecStart=/usr/local/bin/kube-apiserver \\
+  --advertise-address=${INTERNAL_IP} \\
+  --allow-privileged=true \\
+  --apiserver-count=3 \\
+  --audit-log-maxage=30 \\
+  --audit-log-maxbackup=3 \\
+  --audit-log-maxsize=100 \\
+  --audit-log-path=/var/log/audit.log \\
+  --authorization-mode=Node,RBAC \\
+  --bind-address=0.0.0.0 \\
+  --client-ca-file=/var/lib/kubernetes/ca.pem \\
+  --enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \\
+  --etcd-cafile=/var/lib/kubernetes/ca.pem \\
+  --etcd-certfile=/var/lib/kubernetes/master-kubernetes.pem \\
+  --etcd-keyfile=/var/lib/kubernetes/master-kubernetes-key.pem\\
+  --etcd-servers=https://172.31.0.10:2379,https://172.31.0.11:2379,https://172.31.0.12:2379 \\
+  --event-ttl=1h \\
+  --encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
+  --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\
+  --kubelet-client-certificate=/var/lib/kubernetes/master-kubernetes.pem \\
+  --kubelet-client-key=/var/lib/kubernetes/master-kubernetes-key.pem \\
+  --runtime-config='api/all=true' \\
+  --service-account-key-file=/var/lib/kubernetes/service-account.pem \\
+  --service-account-signing-key-file=/var/lib/kubernetes/service-account-key.pem \\
+  --service-account-issuer=https://${INTERNAL_IP}:6443 \\
+  --service-cluster-ip-range=172.32.0.0/24 \\
+  --service-node-port-range=30000-32767 \\
+  --tls-cert-file=/var/lib/kubernetes/master-kubernetes.pem \\
+  --tls-private-key-file=/var/lib/kubernetes/master-kubernetes-key.pem \\
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+#### Moving the kube-controller-manager kubeconfig into place: 
+```
+sudo mv kube-controller-manager.kubeconfig /var/lib/kubernetes/
+```
+#### Exporting some variables to retrieve the vpc_cidr which will be required for the bind-address flag
+```
+export AWS_METADATA="http://169.254.169.254/latest/meta-data"
+export EC2_MAC_ADDRESS=$(curl -s $AWS_METADATA/network/interfaces/macs/ | head -n1 | tr -d '/')
+export VPC_CIDR=$(curl -s $AWS_METADATA/network/interfaces/macs/$EC2_MAC_ADDRESS/vpc-ipv4-cidr-block/)
+export NAME=k8s-cluster-from-ground-up
+```
+#### Creating the kube-controller-manager.service systemd unit file
+```
+cat <<EOF | sudo tee /etc/systemd/system/kube-controller-manager.service
+[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+ExecStart=/usr/local/bin/kube-controller-manager \\
+  --bind-address=0.0.0.0 \\
+  --cluster-cidr=${VPC_CIDR} \\
+  --cluster-name=${NAME} \\
+  --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \\
+  --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \\
+  --kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\
+  --authentication-kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\
+  --authorization-kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\
+  --leader-elect=true \\
+  --root-ca-file=/var/lib/kubernetes/ca.pem \\
+  --service-account-private-key-file=/var/lib/kubernetes/service-account-key.pem \\
+  --service-cluster-ip-range=172.32.0.0/24 \\
+  --use-service-account-credentials=true \\
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+#### Moving the kube-scheduler kubeconfig into place
+```
+sudo mv kube-scheduler.kubeconfig /var/lib/kubernetes/
+sudo mkdir -p /etc/kubernetes/config
+```
+#### Creating the kube-scheduler.yaml configuration file:
+```
+cat <<EOF | sudo tee /etc/kubernetes/config/kube-scheduler.yaml
+apiVersion: kubescheduler.config.k8s.io/v1beta1
+kind: KubeSchedulerConfiguration
+clientConnection:
+  kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
+leaderElection:
+  leaderElect: true
+EOF
+```
+#### Creating the kube-scheduler.service systemd unit file
+```
+cat <<EOF | sudo tee /etc/systemd/system/kube-scheduler.service
+[Unit]
+Description=Kubernetes Scheduler
+Documentation=https://github.com/kubernetes/kubernetes
+
+[Service]
+ExecStart=/usr/local/bin/kube-scheduler \\
+  --config=/etc/kubernetes/config/kube-scheduler.yaml \\
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+#### Starting the Controller Services
+```
+{
+sudo systemctl daemon-reload
+sudo systemctl enable kube-apiserver kube-controller-manager kube-scheduler
+sudo systemctl start kube-apiserver kube-controller-manager kube-scheduler
+}
+```
+#### Checking the status of the services
+```
+{
+sudo systemctl status kube-apiserver
+sudo systemctl status kube-controller-manager
+sudo systemctl status kube-scheduler
+}
+```
+![Screenshot (739)](https://user-images.githubusercontent.com/112771723/207854646-737c7c36-a6fe-4b3f-8724-483152720eb2.png)
+![Screenshot (740)](https://user-images.githubusercontent.com/112771723/207854705-f2ec1a3e-8f46-4a69-9353-22b162b8dcd9.png)
+
+#### For kube-apiserver to run, i went to the /etc/systemd/journald.conf file and change storage setting from auto to persistent
+![Screenshot (738)](https://user-images.githubusercontent.com/112771723/207854564-7abdd05f-a48c-4586-92eb-96a2e9e9302b.png)
+
+#### STEP 8: Testing that Everything is working fine
+#### To get the cluster details run
+```
+kubectl cluster-info --kubeconfig admin.kubeconfig
+```
+#### To get the current namespaces
+```
+kubectl get namespaces --kubeconfig admin.kubeconfig
+```
