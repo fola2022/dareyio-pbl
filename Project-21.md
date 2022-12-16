@@ -1113,6 +1113,11 @@ sudo systemctl status kube-scheduler
 ![Screenshot (738)](https://user-images.githubusercontent.com/112771723/207854564-7abdd05f-a48c-4586-92eb-96a2e9e9302b.png)
 
 ### STEP 8: Testing that Everything is working fine
+![Projec21](images/image57.PNG)
+![Projec21](images/image58.PNG)
+![Projec21](images/image59.PNG)
+![Projec21](images/image60.PNG)
+
 #### To get the cluster details run
 ```
 kubectl cluster-info --kubeconfig admin.kubeconfig
