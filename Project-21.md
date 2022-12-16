@@ -1,7 +1,5 @@
-## ORCHESTRATING CONTAINERS ACROSS MULTIPLE VIRTUAL SERVERS WITH KUBERNETES. PART 1
-# K8s From Grounds Up
-![Kubernetes Architecture](imgs/K8s_architecture.png)
-
+# ORCHESTRATING CONTAINERS ACROSS MULTIPLE VIRTUAL SERVERS WITH KUBERNETES. PART 1
+## K8s From Grounds Up
 ## Install Client Tools
 Tools:
 - awscli: Tool used to manage AWS resources
