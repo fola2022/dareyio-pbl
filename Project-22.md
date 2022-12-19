@@ -191,7 +191,7 @@ spec:
   template:
     metadata:
       labels:
-        app: tooling-ap
+        app: tooling-app
     spec:
       containers:
       - name: tooling
@@ -201,14 +201,68 @@ spec:
 ```
 <img width="708" alt="nginx loadbalancer" src="https://user-images.githubusercontent.com/112771723/208490390-51579068-63b8-4601-bddb-a2ab609c149d.png">
 
----
-kubectl get service nginx-service -o yaml
-```
+`kubectl get service nginx-service -o yaml`
 <img width="943" alt="lb" src="https://user-images.githubusercontent.com/112771723/208490153-28a0c501-dc6f-480c-a885-b1642af59d72.png">
 
 #### STEP 4: Creating Deployment
-A Deployment is another layer above ReplicaSets and Pods, It manages the deployment of ReplicaSets and allows for easy updating of a ReplicaSet as well as the ability to roll back to a previous version of deployment. To see it in action:
+#### Deleting the ReplicaSet that was created before:  `kubectl delete rs nginx-rs`
+#### Creating deployment manifest file called deployment.yaml 
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    tier: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 8
+```
+#### Running the apply command `kubectl apply -f deployment.yaml`
+<img width="215" alt="deploy" src="https://user-images.githubusercontent.com/112771723/208492506-23ff2757-7d9d-430c-b2da-080b58a01dc7.png">
 
-Deleting the ReplicaSet that was created before: $ kubectl delete rs nginx-rs
-Creating deployment manifest file called deployment.yaml and applying it:$ kubectl apply -f deployment.yaml
+```
+kubectl get deploy
+kubectl get rs
+```
+<img width="377" alt="get deploy" src="https://user-images.githubusercontent.com/112771723/208492680-bb3bd573-8185-4326-8dc4-e0e067c5e294.png">
+
+#### Scaled the replicas in the Deployment to 15 Pods
+<img width="467" alt="scaled 15" src="https://user-images.githubusercontent.com/112771723/208492589-b47c6ba9-1613-45c7-ab39-0bd485e26dd5.png">
+
+#### Exec into one of the Pod’s container to run Linux commands
+```
+kubectl exec -it nginx-deployment-b87799947-q7qb6 bash
+```
+#### Listing the files and folders in the Nginx directory
+<img width="726" alt="pod exec" src="https://user-images.githubusercontent.com/112771723/208493672-2faf16ef-ec3c-4a22-b343-37d45d10a89e.png">
+
+#### Checking the content of the default Nginx configuration file
+<img width="452" alt="nginx config" src="https://user-images.githubusercontent.com/112771723/208493885-2ccd1f6b-a4ee-45b0-937b-8aa9cae4e262.png">
+
+### PERSISTING DATA FOR PODS
+#### Scaled the Pods down to 1 replica
+#### Exec into the running container
+```
+kubectl exec -it nginx-deployment-b87799947-p2ft8 bash
+```
+#### Installing vim so that i can edit the file /usr/share/nginx/html/index.html
+```
+apt-get update
+apt-get install vim
+```
+
+
 
