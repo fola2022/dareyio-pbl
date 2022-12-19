@@ -298,7 +298,99 @@ for skills acquisition
 kubectl delete po nginx-deployment-b87799947-p2ft8
 ``` 
 #### The web page was refreshed and the content is no longer there. This is because Pods do not store data when they are being recreated – that is why they are called ephemeral or stateless. 
+<img width="622" alt="nf broswer" src="https://user-images.githubusercontent.com/112771723/208511296-859bd425-c5d5-4912-b24a-0e21320897a8.png">
 
 ## SIDE TASK
+### Deploying Tooling Application With Kubernetes
+#### The tooling application that was containerised with Docker in Project 20, the following shows how the image is pulled and deployed as pods in Kubernetes:
+#### Creating deployment manifest file for the tooling aplication called tooling-deploy.yaml and applying it
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tooling-deployment
+  labels:
+    app: tooling-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tooling-app
+  template:
+    metadata:
+      labels:
+        app: tooling-app
+    spec:
+      containers:
+      - name: tooling
+        image: folah/tooling:0.0.2
+        ports:
+        - containerPort: 80
+```
+#### Creating Service manifest file for the tooling aplication called tooling-service.yaml and applying it
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: tooling-service
+spec:
+  selector:
+    app: tooling-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+ ```    
+ #### Creating deployment manifest file for the MySQL database application called mysql-deploy.yaml and applying it
+ ```
+ apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: mysql-deployment
+ labels:
+   tier: mysql-db
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     tier: mysql-db
+ template:
+   metadata:
+     labels:
+       tier: mysql-db
+   spec:
+     containers:
+     - name: mysql
+       image: mysql:5.7
+       env:
+       - name: MYSQL_DATABASE
+         value: toolingdb
+       - name: MYSQL_USER
+         value: somex
+       - name: MYSQL_PASSWORD
+         value: password123
+       - name: MYSQL_ROOT_PASSWORD
+         value: password1234
+       ports:
+       - containerPort: 3306
+```     
+#### Creating Service manifest file for the MySQL database application called mysql-service.yaml and applying it
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  selector:
+    tier: mysql-db
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+```
+#### Accessing the application from the browser by port forwarding the service:
+<img width="576" alt="mysql" src="https://user-images.githubusercontent.com/112771723/208513293-47510c8b-abe1-4fc4-9596-f481ad1273e4.png">
 
+      
+      
 
