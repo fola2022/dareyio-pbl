@@ -206,3 +206,9 @@ kubectl get service nginx-service -o yaml
 ```
 <img width="943" alt="lb" src="https://user-images.githubusercontent.com/112771723/208490153-28a0c501-dc6f-480c-a885-b1642af59d72.png">
 
+#### STEP 4: Creating Deployment
+A Deployment is another layer above ReplicaSets and Pods, It manages the deployment of ReplicaSets and allows for easy updating of a ReplicaSet as well as the ability to roll back to a previous version of deployment. To see it in action:
+
+Deleting the ReplicaSet that was created before: $ kubectl delete rs nginx-rs
+Creating deployment manifest file called deployment.yaml and applying it:$ kubectl apply -f deployment.yaml
+
