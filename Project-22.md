@@ -361,19 +361,21 @@ spec:
    spec:
      containers:
      - name: mysql
-       image: mysql:5.7
+       image: mysql:latest
        env:
        - name: MYSQL_DATABASE
          value: toolingdb
        - name: MYSQL_USER
-         value: somex
+         value: folah
        - name: MYSQL_PASSWORD
          value: password123
        - name: MYSQL_ROOT_PASSWORD
          value: password1234
        ports:
        - containerPort: 3306
-```     
+``` 
+<img width="330" alt="mysql deploy" src="https://user-images.githubusercontent.com/112771723/208514237-5eca14b1-5f8f-4617-8a8e-aafe7d20b202.png">
+
 #### Creating Service manifest file for the MySQL database application called mysql-service.yaml and applying it
 ```
 apiVersion: v1
@@ -390,7 +392,7 @@ spec:
 ```
 #### Accessing the application from the browser by port forwarding the service:
 <img width="576" alt="mysql" src="https://user-images.githubusercontent.com/112771723/208513293-47510c8b-abe1-4fc4-9596-f481ad1273e4.png">
+<img width="535" alt="tooling" src="https://user-images.githubusercontent.com/112771723/208513586-c99e3cb6-13fd-4b23-a87a-9926e0ffa7ea.png">
 
-      
       
 
