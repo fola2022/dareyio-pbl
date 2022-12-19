@@ -74,7 +74,60 @@ spec:
 <img width="196" alt="nginxxx" src="https://user-images.githubusercontent.com/112771723/208483410-c99a4071-49cb-41fa-9830-c22631f7ea97.png">
 <img width="438" alt="nginx service" src="https://user-images.githubusercontent.com/112771723/208483108-bf7fef09-78a4-4973-9ca8-af573e0e28b2.png">
 
-#### Since the type of service created for the Nginx pod is a ClusterIP which cannot be accessed externally, we can do port-forwarding in order to bind the machine's port to the ClusterIP service port, i.e, tunnelling traffic through the machine's port number to the port number of the nginx-service: $ kubectl port-forward svc/nginx-service 8089:80
+#### Since the type of service created for the Nginx pod is a ClusterIP which cannot be accessed externally, doing port-forwarding in order to bind the machine's port to the ClusterIP service port, i.e, tunnelling traffic through the machine's port number to the port number of the nginx-service: 
+```
+kubectl port-forward svc/nginx-service 8089:80
+```
+<img width="463" alt="port" src="https://user-images.githubusercontent.com/112771723/208485902-1edad68f-640c-4c84-9dfc-338acccb263b.png">
+<img width="616" alt="nginx on broswer" src="https://user-images.githubusercontent.com/112771723/208485980-1c062b8f-c0e1-40b9-bad0-08b70ffd0cc2.png">
+
+### STEP 3: Creating A Replica Set
+#### The replicaSet object helps to maintain a stable set of Pod replicas running at any given time to achieve availability in case one or two pods dies.
+#### Deleting the nginx-pod: `kubectl delete pod nginx-pod`
+#### Creating the replicaSet manifest file and applying it: `kubectl apply -f rs.yaml`
+#### rs.yaml manifest file
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    app: nginx-pod
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+         app: nginx-pod
+    spec:
+      containers:
+      - image: nginx:latest
+        name: nginx-pod
+        ports:
+        - containerPort: 80
+          protocol: TCP
+```
+<img width="200" alt="replicaset" src="https://user-images.githubusercontent.com/112771723/208486712-52480ab1-e086-4488-81a5-64de70233690.png">
+<img width="328" alt="rs created" src="https://user-images.githubusercontent.com/112771723/208486629-4e520653-754c-40d4-9d5a-4c4658bb6b0d.png">
+
+```
+kubectl get pod
+```
+<img width="323" alt="3 replica" src="https://user-images.githubusercontent.com/112771723/208486894-9ec15df0-f2d2-4911-941b-3ccb553294cc.png">
+
+#### Deleting one of the pods will cause another one to be scheduled and set to run: kubectl delete pod nginx-rs-gprcc
+#### Another pod scheduled
+<img width="323" alt="del cre" src="https://user-images.githubusercontent.com/112771723/208487066-289eb41a-b3d5-4710-9cd4-1d8dada35a95.png">
+
+#### Two ways pods can be scaled are Imperative and Declarative
+Imperative method is by running a command on the CLI:
+```
+kubectl scale --replicas 5 replicaset nginx-rs
+```
+<img width="359" alt="imperative scale rs" src="https://user-images.githubusercontent.com/112771723/208487593-50ef8a5f-8af8-4861-bc4a-b7de7e6fd827.png">
+
+#### Declarative method is done by editing the rs.yaml manifest and changing to the desired number of replicas and applying the update
 deployment.yaml
 ```
 apiVersion: apps/v1
