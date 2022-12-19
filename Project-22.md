@@ -78,7 +78,7 @@ spec:
 ```
 kubectl port-forward svc/nginx-service 8089:80
 ```
-<img width="463" alt="port" src="https://user-images.githubusercontent.com/112771723/208485902-1edad68f-640c-4c84-9dfc-338acccb263b.png">
+<img width="446" alt="port 9000" src="https://user-images.githubusercontent.com/112771723/208514513-06fa109d-094f-4ab5-a239-190352234d7b.png">
 <img width="616" alt="nginx on broswer" src="https://user-images.githubusercontent.com/112771723/208485980-1c062b8f-c0e1-40b9-bad0-08b70ffd0cc2.png">
 
 ### STEP 3: Creating A Replica Set
