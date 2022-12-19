@@ -191,7 +191,7 @@ spec:
   template:
     metadata:
       labels:
-        app: tooling-app
+        app: tooling-ap
     spec:
       containers:
       - name: tooling
