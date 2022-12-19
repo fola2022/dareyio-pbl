@@ -112,9 +112,11 @@ spec:
 <img width="328" alt="rs created" src="https://user-images.githubusercontent.com/112771723/208486629-4e520653-754c-40d4-9d5a-4c4658bb6b0d.png">
 
 ```
+kubectl describe nginx-rs
 kubectl get pod
 ```
 <img width="323" alt="3 replica" src="https://user-images.githubusercontent.com/112771723/208486894-9ec15df0-f2d2-4911-941b-3ccb553294cc.png">
+<img width="503" alt="describe nginx rs" src="https://user-images.githubusercontent.com/112771723/208489968-ae1847c8-3685-4129-86cf-2699ec4537e0.png">
 
 #### Deleting one of the pods will cause another one to be scheduled and set to run: kubectl delete pod nginx-rs-gprcc
 #### Another pod scheduled
@@ -128,7 +130,52 @@ kubectl scale --replicas 5 replicaset nginx-rs
 <img width="359" alt="imperative scale rs" src="https://user-images.githubusercontent.com/112771723/208487593-50ef8a5f-8af8-4861-bc4a-b7de7e6fd827.png">
 
 #### Declarative method is done by editing the rs.yaml manifest and changing to the desired number of replicas and applying the update
-deployment.yaml
+#### In some cases, we want ReplicaSet to manage our existing containers that match certain criteria, we can use the same simple label matching or we can use some more complex conditions, such as:
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata: 
+  name: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      env: prod
+    matchExpressions:
+    - { key: tier, operator: In, values: [frontend] }
+  template:
+    metadata:
+      name: nginx
+      labels: 
+        env: prod
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+          protocol: TCP
+```          
+#### nginx-service.yaml manifest file
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: LoadBalancer
+  selector:
+    tier: frontend
+  ports:
+    - protocol: TCP
+      port: 80 # This is the port the Loadbalancer is listening at
+      targetPort: 80 # This is the port the container is listening at
+```  
+#### After applying the configuration
+```
+kubectl apply -f nginx-service.yaml
+```
 ```
 apiVersion: apps/v1
 kind: Deployment
@@ -152,3 +199,10 @@ spec:
         ports:
         - containerPort: 80
 ```
+<img width="708" alt="nginx loadbalancer" src="https://user-images.githubusercontent.com/112771723/208490390-51579068-63b8-4601-bddb-a2ab609c149d.png">
+
+---
+kubectl get service nginx-service -o yaml
+```
+<img width="943" alt="lb" src="https://user-images.githubusercontent.com/112771723/208490153-28a0c501-dc6f-480c-a885-b1642af59d72.png">
+
