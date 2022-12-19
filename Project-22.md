@@ -263,6 +263,42 @@ kubectl exec -it nginx-deployment-b87799947-p2ft8 bash
 apt-get update
 apt-get install vim
 ```
+### Updating the content of the file and adding the code below /usr/share/nginx/html/index.html
+```
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to DAREY.IO!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to DAREY.IO!</h1>
+<p>I love experiencing Kubernetes</p>
 
+<p>Learning by doing is absolutely the best strategy at 
+<a href="https://darey.io/">www.darey.io</a>.<br/>
+for skills acquisition
+<a href="https://darey.io/">www.darey.io</a>.</p>
+
+<p><em>Thank you for learning from DAREY.IO</em></p>
+</body>
+</html>
+```
+<img width="349" alt="edit html" src="https://user-images.githubusercontent.com/112771723/208510049-393533d8-a33e-4cc8-a219-81fbfd4dffd3.png">
+<img width="618" alt="broswer2" src="https://user-images.githubusercontent.com/112771723/208510030-3f279fad-3f4a-4619-a2e6-40328b2956ff.png">
+
+#### Now, deleting the only running Pod
+```
+kubectl delete po nginx-deployment-b87799947-p2ft8
+``` 
+#### The web page was refreshed and the content is no longer there. This is because Pods do not store data when they are being recreated – that is why they are called ephemeral or stateless. 
+
+## SIDE TASK
 
 
