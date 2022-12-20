@@ -1,5 +1,14 @@
 # PERSISTING DATA IN KUBERNETES
-### Setting up EKS cluster with a single commandline:
+## INTRODUCTION
+### The pods created in Kubernetes are ephemeral, they don't run for long. When a pod dies, any data that is not part of the container image will be lost when the container is restarted because Kubernetes is best at managing stateless applications which means it does not manage data persistence. To ensure data persistent, the PersistentVolume PV, PersistentVolumeClaim PVC or Configmap resource can be implement to acheive this.
+### STEP 1: Setting Up AWS Elastic Kubernetes Service With EKSCTL
+#### Installing eksctl
+```
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+eksctl version
+```
+#### Setting up EKS cluster with a single commandline:
 ```
 eksctl create cluster \
   --name my-eks-clusters \
@@ -40,3 +49,5 @@ spec:
 <img width="233" alt="nginx-pod" src="https://user-images.githubusercontent.com/112771723/208665974-faab1f13-eb0c-44a9-bed3-2b5d63eac0b0.png">
 <img width="335" alt="nginx-pod created" src="https://user-images.githubusercontent.com/112771723/208666012-f037aac2-0e2f-4136-8855-484c024db1e2.png">
 
+###Verifying that the pod is running: $ kubectl get pod
+Exec into the pod and navigating to the nginx configuration file:
