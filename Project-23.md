@@ -105,7 +105,7 @@ spec:
 <img width="467" alt="pod creating after adding volume" src="https://user-images.githubusercontent.com/112771723/208771183-c3c73c3f-9086-4c28-8d8e-6a9457ec5400.png">
 
 #### But the problem with this configuration is that when we port forward the service and try to reach the endpoint, we will get a 403 error. This is because mounting a volume on a filesystem that already contains data will automatically erase all the existing data. To solve this issue is by implementing Persistent Volume(PV) and Persistent Volume claims(PVCs) resource.
-#### STEP 3: Managing Volumes Dynamically With PV and PVCs
+### STEP 3: Managing Volumes Dynamically With PV and PVCs
 #### PVs are resources in the cluster. PVCs are requests for those resources and also act as claim checks to the resource. By default in EKS, there is a default storageClass configured as part of EKS installation which allow us to dynamically create a PV which will create a volume that a Pod will use.
 #### Verifying that there is a storageClass in the cluster: `kubectl get storageclass`
 <img width="630" alt="storage class" src="https://user-images.githubusercontent.com/112771723/208771822-bd6dba5b-45bf-4815-9f39-f609340f2504.png">
