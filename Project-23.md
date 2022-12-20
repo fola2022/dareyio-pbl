@@ -3,7 +3,7 @@
 ```
 eksctl create cluster \
   --name my-eks-clusters \
-  --version 1.21 \
+  --version 1.24 \
   --region us-east-1 \
   --nodegroup-name worker-nodes \
   --node-type t2.medium \
