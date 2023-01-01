@@ -93,6 +93,67 @@ module "vpc" {
   }
 }
 ```
+<img width="845" alt="network tf" src="https://user-images.githubusercontent.com/112771723/210186405-2c69d309-91c2-4569-9209-6535cd55b9f1.png">
+
+#### Creating the variables.tf file
+```
+# create some variables
+variable "cluster_name" {
+  type        = string
+  description = "EKS cluster name."
+}
+
+variable "iac_environment_tag" {
+  type        = string
+  description = "AWS tag to indicate environment name of each infrastructure object."
+}
+
+variable "name_prefix" {
+  type        = string
+  description = "Prefix to be used on each infrastructure object Name created in AWS."
+}
+
+variable "main_network_block" {
+  type        = string
+  description = "Base CIDR block to be used in our VPC."
+}
+
+variable "subnet_prefix_extension" {
+  type        = number
+  description = "CIDR block bits extension to calculate CIDR blocks of each subnetwork."
+}
+
+variable "zone_offset" {
+  type        = number
+  description = "CIDR block bits extension offset to calculate Public subnets, avoiding collisions with Private subnets."
+}
+
+variable "admin_users" {
+  type        = list(string)
+  description = "List of Kubernetes admins."
+}
+
+variable "developer_users" {
+  type        = list(string)
+  description = "List of Kubernetes developers."
+}
+
+variable "asg_instance_types" {
+  description = "List of EC2 instance machine types to be used in EKS."
+}
+
+variable "autoscaling_minimum_size_by_az" {
+  type        = number
+  description = "Minimum number of EC2 instances to autoscale our EKS cluster on each AZ."
+}
+
+variable "autoscaling_maximum_size_by_az" {
+  type        = number
+  description = "Maximum number of EC2 instances to autoscale our EKS cluster on each AZ."
+}
+```
+<img width="785" alt="variable tf" src="https://user-images.githubusercontent.com/112771723/210186441-4883a461-eeab-4682-8e72-be515b47b628.png">
+
 #### Creating the data.tf file that will pull the available AZs for use:
 ```
 # get all available AZs in our region
@@ -100,6 +161,14 @@ data "aws_availability_zones" "available_azs" {
   state = "available"
 }
 data "aws_caller_identity" "current" {} # used for accesing Account ID and ARN
+
+# get EKS cluster info to configure Kubernetes and Helm providers
+data "aws_eks_cluster" "cluster" {
+  name = module.eks_cluster.cluster_id
+}
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks_cluster.cluster_id
+}
 ```
 #### Creating the eks.tf file that will provision EKS cluster
 ```
@@ -130,6 +199,8 @@ module "eks_cluster" {
   }
 }
 ```
+<img width="605" alt="eks cluster eks tf" src="https://user-images.githubusercontent.com/112771723/210186423-269fe913-cbee-4ff7-981e-2c32cbf2038f.png">
+
 #### Creating the locals.tf file for local variables because Terraform does not allow assigning variable to variables
 ```
 # render Admin & Developer users list with the structure required by EKS module
@@ -186,3 +257,81 @@ locals {
   }
 }
 ```
+#### Creating the terraform.tfvars to set values for variables
+```
+cluster_name            = "tooling-app-eks"
+iac_environment_tag     = "development"
+name_prefix             = "somex-io-eks"
+main_network_block      = "10.0.0.0/16"
+subnet_prefix_extension = 4
+zone_offset             = 8
+
+# Ensure that these users already exist in AWS IAM. Another approach is that you can introduce an iam.tf file to manage users separately, get the data source and interpolate their ARN.
+admin_users                    = ["somex", "grandol"]
+developer_users                = ["alex", "victor"]
+asg_instance_types             = [{ instance_type = "t3.small" }, { instance_type = "t2.small" }, ]
+autoscaling_minimum_size_by_az = 1
+autoscaling_maximum_size_by_az = 5
+```
+#### Creating the provider.tf file
+```
+provider "aws" {
+  region = "us-west-1"
+}
+
+provider "random" {
+}
+
+# get EKS authentication for being able to manage k8s objects from terraform
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+```
+#### Running the terraform init command
+<img width="719" alt="terraform init 1" src="https://user-images.githubusercontent.com/112771723/210186753-d68a61dd-d325-4ade-9e08-7feb8a8e8c68.png">
+<img width="479" alt="terraform init 2" src="https://user-images.githubusercontent.com/112771723/210186760-75a0bd9a-abb1-4447-8e59-2ae769ea2a9c.png">
+
+#### Running the terraform plan command to confirm the configuration
+<img width="899" alt="terraform plan 1" src="https://user-images.githubusercontent.com/112771723/210186771-fe09aa9c-a527-4b96-87af-4de47722de80.png">
+
+#### Creating the kubeconfig file using awscli
+```
+aws eks update-kubeconfig --name tooling-app-eks --region us-west-1 --kubeconfig kubeconfig
+```
+### STEP 2: Installing Helm From Script
+```
+wget https://get.helm.sh/helm-v3.6.3-linux-amd64.tar.gz
+tar xvf helm-v3.6.3-linux-amd64.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin
+rm -rf linux-amd64
+helm version
+```
+<img width="941" alt="helm install 1" src="https://user-images.githubusercontent.com/112771723/210186869-2f899c85-d007-4281-9d79-c5e3447c389d.png">
+
+### STEP 3: Deploying Jenkins With Helm
+Adding the Jenkins' repository to helm so it can be easily downloaded and deployed:
+```
+helm repo add jenkins https://charts.jenkins.io
+helm repo update
+helm install jenkins jenkins/jenkins --kubeconfig kubeconfig
+```
+<img width="946" alt="install jenkins" src="https://user-images.githubusercontent.com/112771723/210187004-e3c850fc-47c9-4fcd-bce3-3bf836f6f1d9.png">
+
+#### Running some commands to inspect the installation
+<img width="483" alt="jenkins running" src="https://user-images.githubusercontent.com/112771723/210187045-13009a4d-5f97-4c20-a324-a305fe2deaa1.png">
+
+#### Accessing the Jenkins app from the browser:http://localhost:8080
+<img width="926" alt="end" src="https://user-images.githubusercontent.com/112771723/210187079-cc74bdf9-0872-4ced-9c6b-525e15f3fe10.png">
+
+
+
+
+
+
+
+
+
+
+
