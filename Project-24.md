@@ -319,11 +319,89 @@ helm install jenkins jenkins/jenkins --kubeconfig kubeconfig
 ```
 <img width="946" alt="install jenkins" src="https://user-images.githubusercontent.com/112771723/210187004-e3c850fc-47c9-4fcd-bce3-3bf836f6f1d9.png">
 
-#### Running some commands to inspect the installation
-<img width="483" alt="jenkins running" src="https://user-images.githubusercontent.com/112771723/210187045-13009a4d-5f97-4c20-a324-a305fe2deaa1.png">
+#### In order to run the kubectl commands without specifying the kubeconfig file, a package manager for kubectl called krew is installed so that it will enable us to install plugins to extend the functionality of kubectl:
+<img width="717" alt="krew install 1" src="https://user-images.githubusercontent.com/112771723/210187224-68ef22f4-ff4f-4581-b921-dffb1897caf6.png">
+<img width="812" alt="krew install 2" src="https://user-images.githubusercontent.com/112771723/210187230-0b959c56-ec63-44ae-96f6-f1e070b5bf22.png">
+<img width="557" alt="install knew 2" src="https://user-images.githubusercontent.com/112771723/210187149-0d960e50-2fab-44d5-84dd-15621e0bdf16.png">
 
-#### Accessing the Jenkins app from the browser:http://localhost:8080
+#### Installing Konfig plugin:
+```
+kubectl krew install konfig
+```
+<img width="479" alt="konfig install" src="https://user-images.githubusercontent.com/112771723/210187196-03fe72ec-ec17-4592-a1a5-74b472ceb2dc.png">
+
+#### Running some commands to inspect the Jenkins installation and Accessing the Jenkins app from the browser:http://localhost:8080
+<img width="483" alt="jenkins running" src="https://user-images.githubusercontent.com/112771723/210187045-13009a4d-5f97-4c20-a324-a305fe2deaa1.png">
 <img width="926" alt="end" src="https://user-images.githubusercontent.com/112771723/210187079-cc74bdf9-0872-4ced-9c6b-525e15f3fe10.png">
+
+#### STEP 4: Deploying Artifactory With Helm
+```
+helm repo add jfrog https://charts.jfrog.io 
+helm repo update
+helm upgrade --install artifactory jfrog/artifactory
+```
+<img width="833" alt="artifactory" src="https://user-images.githubusercontent.com/112771723/210187317-3fe82b8a-4ad2-40d2-a958-2ed8c9464d0e.png">
+
+#### STEP 5: Deploying Hashicorp Vault With Helm
+```
+helm repo add hashicorp https://helm.releases.hashicorp.com 
+helm repo update
+helm install vault hashicorp/vault
+```
+<img width="727" alt="hashicorp vault installed" src="https://user-images.githubusercontent.com/112771723/210187357-76c843ea-d6bb-4dd5-bc8b-b16db8ec7b33.png">
+
+#### Port forwarding to access Hashicorp vault from the UI:
+```
+kubectl port-forward svc/vault 5000:8200
+```
+<img width="948" alt="hashicorp service" src="https://user-images.githubusercontent.com/112771723/210187374-1792faa2-3c66-4939-9865-8374af7e6ef4.png">
+
+#### Accessing the app from the browser:http://localhost:5000
+<img width="830" alt="hashicorp vault" src="https://user-images.githubusercontent.com/112771723/210187393-0e48c35c-9a1e-4342-846c-5a66ecc5072d.png">
+
+#### STEP 6: Deploying Prometheus With Helm
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/prometheus
+```
+<img width="875" alt="prometheus installed" src="https://user-images.githubusercontent.com/112771723/210187426-9161cd1d-b40a-47f6-9779-d4f0b46d4d92.png">
+
+#### Port forwarding to access prometheus for alert manager from the UI:$ kubectl port-forward svc/myprometheus-alertmanager 8000:9093
+#### Port forwarding to access prometheus for alert manager from the UI:$ kubectl port-forward svc/myprometheus-prometheus-pushgateway 8001:9091
+
+<img width="587" alt="prometheus service" src="https://user-images.githubusercontent.com/112771723/210187436-0341f666-145d-49a3-a631-7dea5a27b887.png">
+<img width="893" alt="prometheus" src="https://user-images.githubusercontent.com/112771723/210187467-46b30326-ca31-4c8f-b416-73664728beba.png">
+<img width="897" alt="prometheus 2" src="https://user-images.githubusercontent.com/112771723/210187470-c62de5ac-d143-4ae0-8b5b-704374cb666d.png">
+
+#### STEP 6: Deploying Grafana With Helm
+```
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+helm install grafana-tool grafana/grafana
+```
+<img width="949" alt="grafana installed" src="https://user-images.githubusercontent.com/112771723/210187523-88905ef1-cb86-439d-a4af-c3bdd25f84fb.png">
+<img width="946" alt="grafana pod and service" src="https://user-images.githubusercontent.com/112771723/210187541-36af2f4d-5397-4701-a8e3-01ff118e10db.png">
+
+#### Port forwarding to access grafana from the UI:$ kubectl port-forward svc/grafana-tool 8300:80
+<img width="686" alt="grafana broswer" src="https://user-images.githubusercontent.com/112771723/210187554-609e4dd6-3a24-4fec-b4a3-cf508dbc7fd3.png">
+<img width="905" alt="grafana b 2" src="https://user-images.githubusercontent.com/112771723/210187571-189ca9c3-7745-4df5-b7da-9220431bfa8f.png">
+
+#### STEP 6: Deploying Elasticsearch With Helm
+```
+helm repo add odysseycloud https://odysseycloud.github.io/oc-charts 
+helm repo update
+helm install elasticsearch odysseycloud/elasticsearch
+```
+<img width="899" alt="elasticsearch" src="https://user-images.githubusercontent.com/112771723/210187624-a334ad7f-1235-40f8-be06-6eccf90e4b7b.png">
+
+### All Pods
+---
+kubectl get pod
+```
+<img width="518" alt="pod" src="https://user-images.githubusercontent.com/112771723/210187649-28436414-348f-4b0f-bdea-82dccf1cf25f.png">
+
+
 
 
 
