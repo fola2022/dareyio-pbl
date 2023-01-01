@@ -296,6 +296,9 @@ provider "kubernetes" {
 #### Running the terraform plan command to confirm the configuration
 <img width="899" alt="terraform plan 1" src="https://user-images.githubusercontent.com/112771723/210186771-fe09aa9c-a527-4b96-87af-4de47722de80.png">
 
+#### Running the terraform apply command
+<img width="945" alt="terraform apply" src="https://user-images.githubusercontent.com/112771723/210187680-87981ea4-e5d4-4532-9a7a-b5b3e28114f6.png">
+
 #### Creating the kubeconfig file using awscli
 ```
 aws eks update-kubeconfig --name tooling-app-eks --region us-west-1 --kubeconfig kubeconfig
