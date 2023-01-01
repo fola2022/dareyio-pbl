@@ -398,10 +398,8 @@ helm install elasticsearch odysseycloud/elasticsearch
 ```
 <img width="899" alt="elasticsearch" src="https://user-images.githubusercontent.com/112771723/210187624-a334ad7f-1235-40f8-be06-6eccf90e4b7b.png">
 
-### All Pods
----
-kubectl get pod
-```
+### All Pods `kubectl get pod`
+
 <img width="518" alt="pod" src="https://user-images.githubusercontent.com/112771723/210187649-28436414-348f-4b0f-bdea-82dccf1cf25f.png">
 
 
