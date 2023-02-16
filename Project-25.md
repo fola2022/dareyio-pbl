@@ -96,10 +96,69 @@ helm install cert-manager --namespace cert-manager --version v1.11.0 jetstack/ce
 ```
 <img width="673" alt="cert-manager installed" src="https://user-images.githubusercontent.com/112771723/219394905-fde53c92-5ef5-42be-a7cd-b394890ae291.png">
 
+#### Creating a Certificate Issuer
+```
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  namespace: "cert-manager"
+  name: "letsencrypt-prod"
+spec:
+  acme:
+    server: "https://acme-v02.api.letsencrypt.org/directory"
+    email: "infradev@oldcowboyshop.com"
+    privateKeySecretRef:
+      name: "letsencrypt-prod"
+    solvers:
+    - selector:
+        dnsZones:
+          - "yellowgem.tk"
+      dns01:
+        route53:
+          region: "us-east-1"
+          hostedZoneID: "Z2CD4NTR2FDPZ"
+``` 
+<img width="340" alt="clusterissuer" src="https://user-images.githubusercontent.com/112771723/219396857-48eccf95-7d35-4457-8139-6f29e3b7d007.png">
 
-         
+```
+kubectl apply -f clusterissuer.yaml
+```
+<img width="314" alt="clusterissuer created" src="https://user-images.githubusercontent.com/112771723/219396668-75ba3b94-5015-4d02-9c36-ac756392fe1d.png">
 
-
-
+#### To ensure that every created ingress also has TLS configured, we will need to update the ingress manifest with TLS specific configurations.
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    kubernetes.io/ingress.class: nginx
+  name: artifactory
+spec:
+  rules:
+  - host: "tooling.artifactory.yellowgem.tk"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: artifactory
+            port:
+              number: 8082
+  tls:
+  - hosts:
+    - "tooling.artifactory.yellowgem.tk"
+    secretName: "tooling.artifactory.yellowgem.tk"
+```
+#### Running the folloing command to see each resources at each phase
+```
+kubectl get certificaaterequest 
+kubectl get order
+kubectl get challenge
+kubectl get certificate
+```
+<img width="729" alt="cert  customerresource" src="https://user-images.githubusercontent.com/112771723/219398540-61845a3b-0962-450d-a190-2c03c386c912.png">
+![image](https://user-images.githubusercontent.com/112771723/219398924-725ef8b9-6227-46d8-b6ba-59ef80c95570.png)
 
 
