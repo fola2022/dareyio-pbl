@@ -159,6 +159,6 @@ kubectl get challenge
 kubectl get certificate
 ```
 <img width="729" alt="cert  customerresource" src="https://user-images.githubusercontent.com/112771723/219398540-61845a3b-0962-450d-a190-2c03c386c912.png">
-![image](https://user-images.githubusercontent.com/112771723/219398924-725ef8b9-6227-46d8-b6ba-59ef80c95570.png)
+
 
 
